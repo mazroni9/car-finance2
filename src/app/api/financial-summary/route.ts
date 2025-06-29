@@ -1,27 +1,35 @@
 import { NextResponse } from 'next/server';
-import supabase from '@/lib/services/supabase';
-import { queryTable } from '@/lib/services/queries';
-import { rateLimit } from '@/lib/rate-limit';
+import { supabase } from '@/lib/services/supabase';
 
 export async function GET() {
   try {
-    const result = await pool.query('SELECT * FROM financial_summaries ORDER BY created_at DESC LIMIT 1');
-    
-    if (result.rows.length === 0) {
-      return NextResponse.json(
-        { error: 'No financial summary found' },
-        { status: 404 }
-      );
-    }
+    const [entries, expenses] = await Promise.all([
+      supabase
+        .from('financial_entries')
+        .select('amount')
+        .gt('created_at', new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString()),
+      supabase
+        .from('finance_expenses')
+        .select('amount')
+        .gt('created_at', new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString())
+    ]);
 
-    return NextResponse.json(result.rows[0]);
+    if (entries.error) throw entries.error;
+    if (expenses.error) throw expenses.error;
+
+    const totalIncome = entries.data?.reduce((sum, entry) => sum + (entry.amount || 0), 0) || 0;
+    const totalExpenses = expenses.data?.reduce((sum, expense) => sum + (expense.amount || 0), 0) || 0;
+
+    return NextResponse.json({
+      totalIncome,
+      totalExpenses,
+      netIncome: totalIncome - totalExpenses,
+      period: '30 days'
+    });
   } catch (error) {
-    console.error('Database Error:', error);
+    console.error('Error fetching financial summary:', error);
     return NextResponse.json(
-      { 
-        error: 'Database connection error',
-        details: process.env.NODE_ENV === 'development' ? error.message : undefined
-      },
+      { error: 'Failed to fetch financial summary' },
       { status: 500 }
     );
   }
