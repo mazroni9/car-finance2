@@ -8,59 +8,71 @@
 'use client'
 
 import React, { useState } from 'react'
-import { createClient } from '@/lib/services/supabase'
+import { supabase } from '@/lib/services/supabase'
 import axios from 'axios'
+import { useRouter } from 'next/navigation'
 
 export default function UploadDocumentPage() {
   const [file, setFile] = useState<File | null>(null)
   const [description, setDescription] = useState('')
   const [isUploading, setUploading] = useState(false)
   const [message, setMessage] = useState('')
+  const router = useRouter()
 
-  const handleUpload = async () => {
-    if (!file) return alert('اختر ملفًا أولاً')
-    setUploading(true)
-
-    const supabase = createClient()
-    let fileUrl = ''
-    let fileType = file.type.split('/')[0] // image / application / etc
+  const handleUpload = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!file) return
 
     try {
+      setUploading(true)
+
+      let fileUrl = ''
+      let fileType = file.type.split('/')[0] // image / application / etc
+
       if (fileType === 'image') {
-        // رفع إلى Cloudinary
         const formData = new FormData()
         formData.append('file', file)
-        formData.append('upload_preset', 'default-preset')  // غير هذا حسب إعدادك
-        const res = await axios.post('https://api.cloudinary.com/v1_1/dzbaenadw/auto/upload', formData)
-        fileUrl = res.data.secure_url
+        
+        const response = await fetch('/api/upload', {
+          method: 'POST',
+          body: formData
+        })
+        
+        const data = await response.json()
+        fileUrl = data.url
       } else {
-        // رفع إلى Supabase Storage
-        const fileName = `${Date.now()}_${file.name}`
-        const { data, error } = await supabase.storage.from('documents').upload(fileName, file)
-        if (error) throw error
-        const { data: urlData } = supabase.storage.from('documents').getPublicUrl(fileName)
-        fileUrl = urlData.publicUrl
+        const filename = `${Math.random().toString(36).substring(7)}_${file.name}`
+        const { error: uploadError, data } = await supabase.storage
+          .from('documents')
+          .upload(filename, file)
+
+        if (uploadError) throw uploadError
+        
+        const { data: { publicUrl } } = supabase.storage
+          .from('documents')
+          .getPublicUrl(filename)
+        
+        fileUrl = publicUrl
       }
 
-      // تخزين في جدول documents
-      const { error: insertError } = await supabase.from('documents').insert({
-        description,
-        file_url: fileUrl,
-        file_type: fileType,
-        uploaded_at: new Date().toISOString(),
-        user_id: 'admin'  // يمكن تغييره حسب النظام
-      })
-      if (insertError) throw insertError
+      const { error } = await supabase
+        .from('documents')
+        .insert({
+          description,
+          file_url: fileUrl,
+          file_type: fileType,
+          user_id: 'admin'  // يمكن تغييره حسب النظام
+        })
 
-      setMessage('✅ تم رفع الملف بنجاح')
-      setFile(null)
-      setDescription('')
-    } catch (err: any) {
-      console.error(err)
-      setMessage(`❌ خطأ: ${err.message || 'فشل غير معروف'}`)
+      if (error) throw error
+
+      router.refresh()
+    } catch (error) {
+      console.error('Error uploading document:', error)
+      alert('Error uploading document')
+    } finally {
+      setUploading(false)
     }
-
-    setUploading(false)
   }
 
   return (
