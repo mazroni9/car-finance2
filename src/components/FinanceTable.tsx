@@ -16,19 +16,8 @@
  * تم بواسطة: فريق DASM-e (بإشراف محمد الزهراني)
  */
 
-import React from 'react';
+iimport React from 'react';
 import Link from 'next/link';
-
-interface Installment {
-  id: string;
-  car_name?: string;
-  total_amount?: number;
-  down_payment?: number;
-  paid_amount?: number;
-  status?: string;
-  start_date?: string;
-  test?: number; // الفحص
-}
 
 interface FinanceTableProps {
   data: Array<{
