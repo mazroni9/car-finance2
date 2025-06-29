@@ -9,14 +9,12 @@
 
 import React, { useState } from 'react'
 import { supabase } from '@/lib/services/supabase'
-import axios from 'axios'
 import { useRouter } from 'next/navigation'
 
 export default function UploadDocumentPage() {
   const [file, setFile] = useState<File | null>(null)
   const [description, setDescription] = useState('')
   const [isUploading, setUploading] = useState(false)
-  const [message, setMessage] = useState('')
   const router = useRouter()
 
   const handleUpload = async (e: React.FormEvent) => {
@@ -25,9 +23,8 @@ export default function UploadDocumentPage() {
 
     try {
       setUploading(true)
-
+      const fileType = file.type.split('/')[0] // image / application / etc
       let fileUrl = ''
-      let fileType = file.type.split('/')[0] // image / application / etc
 
       if (fileType === 'image') {
         const formData = new FormData()
@@ -38,11 +35,11 @@ export default function UploadDocumentPage() {
           body: formData
         })
         
-        const data = await response.json()
-        fileUrl = data.url
+        const { url } = await response.json()
+        fileUrl = url
       } else {
         const filename = `${Math.random().toString(36).substring(7)}_${file.name}`
-        const { error: uploadError, data } = await supabase.storage
+        const { error: uploadError } = await supabase.storage
           .from('documents')
           .upload(filename, file)
 
@@ -61,12 +58,12 @@ export default function UploadDocumentPage() {
           description,
           file_url: fileUrl,
           file_type: fileType,
-          user_id: 'admin'  // يمكن تغييره حسب النظام
+          user_id: 'system'
         })
 
       if (error) throw error
 
-      router.refresh()
+      router.push('/admin/dashboard/documents')
     } catch (error) {
       console.error('Error uploading document:', error)
       alert('Error uploading document')
@@ -76,28 +73,36 @@ export default function UploadDocumentPage() {
   }
 
   return (
-    <div className="p-4 max-w-xl mx-auto">
-      <h1 className="text-xl font-bold mb-4">رفع مستند جديد</h1>
-      <input
-        type="file"
-        onChange={(e) => setFile(e.target.files?.[0] || null)}
-        className="mb-4"
-      />
-      <input
-        type="text"
-        value={description}
-        placeholder="وصف المستند"
-        onChange={(e) => setDescription(e.target.value)}
-        className="mb-4 w-full p-2 border rounded"
-      />
-      <button
-        onClick={handleUpload}
-        disabled={isUploading}
-        className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 disabled:opacity-50"
-      >
-        {isUploading ? '...جارٍ الرفع' : 'رفع المستند'}
-      </button>
-      {message && <p className="mt-4">{message}</p>}
+    <div className="p-4">
+      <h1 className="text-2xl font-bold mb-4">Upload Document</h1>
+      <form onSubmit={handleUpload} className="max-w-md">
+        <div className="mb-4">
+          <label className="block text-sm font-medium mb-1">Description</label>
+          <input
+            type="text"
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+            className="w-full p-2 border rounded"
+            required
+          />
+        </div>
+        <div className="mb-4">
+          <label className="block text-sm font-medium mb-1">File</label>
+          <input
+            type="file"
+            onChange={(e) => setFile(e.target.files?.[0] || null)}
+            className="w-full"
+            required
+          />
+        </div>
+        <button
+          type="submit"
+          disabled={isUploading}
+          className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 disabled:opacity-50"
+        >
+          {isUploading ? 'Uploading...' : 'Upload'}
+        </button>
+      </form>
     </div>
   )
 }
