@@ -17,73 +17,96 @@
 
 import { useEffect, useState } from 'react';
 import { createClient } from '@supabase/supabase-js';
+import { supabase } from '@/lib/services/supabase'
 
-const supabase = createClient(
+const supabaseClient = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 );
 
-export default function AdminDashboard() {
-  const [userCount, setUserCount] = useState(0);
-  const [totalWalletBalance, setTotalWalletBalance] = useState(0);
-  const [totalFundingRequested, setTotalFundingRequested] = useState(0);
-  const [latestTransactions, setLatestTransactions] = useState<any[]>([]);
+interface DashboardStats {
+  totalUsers: number
+  totalTransactions: number
+  totalRevenue: number
+  recentTransactions: Array<{
+    id: string
+    amount: number
+    description: string
+    created_at: string
+  }>
+}
 
-  useEffect(() => {
-    const fetchStats = async () => {
-      const { data: users } = await supabase.from('users').select('id');
-      const { data: wallets } = await supabase.from('wallets').select('balance');
-      const { data: funding } = await supabase.from('funding_requests').select('amount_requested');
-      const { data: transactions } = await supabase
-        .from('transactions')
-        .select('*')
-        .order('created_at', { ascending: false })
-        .limit(5);
+async function fetchDashboardStats(): Promise<DashboardStats> {
+  const [users, transactions] = await Promise.all([
+    supabase.from('users').select('count'),
+    supabase.from('transactions')
+      .select('*')
+      .order('created_at', { ascending: false })
+      .limit(5)
+  ])
 
-      setUserCount(users?.length || 0);
-      setTotalWalletBalance(wallets?.reduce((acc, w) => acc + (w.balance || 0), 0) || 0);
-      setTotalFundingRequested(funding?.reduce((acc, f) => acc + (f.amount_requested || 0), 0) || 0);
-      setLatestTransactions(transactions || []);
-    };
+  if (users.error) throw users.error
+  if (transactions.error) throw transactions.error
 
-    fetchStats();
-  }, []);
+  const totalRevenue = transactions.data.reduce((sum, tx) => sum + (tx.amount || 0), 0)
+
+  return {
+    totalUsers: users.count || 0,
+    totalTransactions: transactions.data.length,
+    totalRevenue,
+    recentTransactions: transactions.data
+  }
+}
+
+export default async function DashboardPage() {
+  const stats = await fetchDashboardStats()
 
   return (
-    <div className="space-y-6 p-6">
-      <h1 className="text-3xl font-bold">لوحة تحكم الإدارة</h1>
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <StatCard title="عدد المستخدمين" value={userCount} color="blue" />
-        <StatCard title="إجمالي رصيد المحافظ" value={`${totalWalletBalance.toLocaleString()} ريال`} color="green" />
-        <StatCard title="إجمالي طلبات التمويل" value={`${totalFundingRequested.toLocaleString()} ريال`} color="purple" />
+    <div className="p-4">
+      <h1 className="text-2xl font-bold mb-4">Dashboard</h1>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="bg-white p-4 rounded shadow">
+          <h2 className="text-lg font-semibold">Total Users</h2>
+          <p className="text-3xl">{stats.totalUsers}</p>
+        </div>
+        <div className="bg-white p-4 rounded shadow">
+          <h2 className="text-lg font-semibold">Total Transactions</h2>
+          <p className="text-3xl">{stats.totalTransactions}</p>
+        </div>
+        <div className="bg-white p-4 rounded shadow">
+          <h2 className="text-lg font-semibold">Total Revenue</h2>
+          <p className="text-3xl">${stats.totalRevenue.toFixed(2)}</p>
+        </div>
       </div>
-
-      <div className="glass-card p-6 mt-6 bg-white shadow">
-        <h2 className="text-xl font-bold mb-4">أحدث 5 عمليات مالية</h2>
-        <table className="w-full text-sm">
-          <thead>
-            <tr className="text-right">
-              <th>نوع العملية</th>
-              <th>المبلغ</th>
-              <th>التاريخ</th>
-            </tr>
-          </thead>
-          <tbody>
-            {latestTransactions.map((tx, idx) => (
-              <tr key={idx} className="border-t">
-                <td>{tx.type}</td>
-                <td>{tx.amount} ريال</td>
-                <td>{new Date(tx.created_at).toLocaleString('ar-EG')}</td>
+      <div className="mt-8">
+        <h2 className="text-xl font-bold mb-4">Recent Transactions</h2>
+        <div className="bg-white rounded shadow overflow-x-auto">
+          <table className="min-w-full">
+            <thead>
+              <tr>
+                <th className="px-4 py-2">ID</th>
+                <th className="px-4 py-2">Description</th>
+                <th className="px-4 py-2">Amount</th>
+                <th className="px-4 py-2">Date</th>
               </tr>
-            ))}
-            {latestTransactions.length === 0 && (
-              <tr><td colSpan={3} className="text-center py-4">لا توجد عمليات</td></tr>
-            )}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {stats.recentTransactions.map((tx) => (
+                <tr key={tx.id}>
+                  <td className="border px-4 py-2">{tx.id}</td>
+                  <td className="border px-4 py-2">{tx.description}</td>
+                  <td className="border px-4 py-2">${tx.amount.toFixed(2)}</td>
+                  <td className="border px-4 py-2">
+                    {new Date(tx.created_at).toLocaleDateString()}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
-  );
+  )
 }
 
 function StatCard({ title, value, color }: { title: string; value: any; color: string }) {

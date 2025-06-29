@@ -1,37 +1,45 @@
 // src/lib/services/queries.ts
 
-import supabase from './supabase';
+import { supabase } from './supabase'
+import type { Database } from '@/types/supabase'
 
-// 🧠 دالة عامة لاستعلام الجداول
-export async function queryTable<T>(
-  tableName: string,
-  options: {
-    columns?: string;
-    filters?: Record<string, any>;
-    limit?: number;
-    orderBy?: { column: string; ascending?: boolean };
-  } = {}
-): Promise<T[]> {
-  let query = supabase.from(tableName).select(options.columns || '*');
+type TableName = keyof Database['public']['Tables']
+type Row<T extends TableName> = Database['public']['Tables'][T]['Row']
 
-  if (options.filters) {
-    for (const [key, value] of Object.entries(options.filters)) {
-      query = query.eq(key, value);
-    }
+interface QueryOptions {
+  orderBy?: {
+    column: string
+    ascending?: boolean
   }
+  limit?: number
+  offset?: number
+}
+
+export async function queryTable<T extends TableName>(
+  tableName: T,
+  options: QueryOptions = {}
+): Promise<Row<T>[]> {
+  let query = supabase.from(tableName).select('*')
 
   if (options.orderBy) {
     query = query.order(options.orderBy.column, {
       ascending: options.orderBy.ascending ?? true
-    });
+    })
   }
 
   if (options.limit) {
-    query = query.limit(options.limit);
+    query = query.limit(options.limit)
   }
 
-  const { data, error } = await query;
+  if (options.offset) {
+    query = query.range(options.offset, options.offset + (options.limit || 10) - 1)
+  }
 
-  if (error) throw error;
-  return data as T[];
+  const { data, error } = await query
+
+  if (error) {
+    throw new Error(`Error querying ${tableName}: ${error.message}`)
+  }
+
+  return data as Row<T>[]
 }
