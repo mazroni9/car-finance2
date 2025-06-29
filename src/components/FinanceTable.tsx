@@ -31,12 +31,12 @@ interface Installment {
 }
 
 interface FinanceTableProps {
-  data: {
+  data: Array<{
     id: string
     amount: number
     date: string
     status: string
-  }[]
+  }>
 }
 
 export default function FinanceTable({ data }: FinanceTableProps) {
