@@ -8,7 +8,7 @@
 'use client'
 
 import React, { useEffect, useState } from 'react'
-import { createClient } from '@/lib/services/supabase'
+import { supabase } from '@/lib/services/supabase'
 import type { Database } from '@/types/supabase'
 import Link from 'next/link'
 import axios from 'axios'
@@ -26,14 +26,16 @@ export default function DocumentsPage() {
   }, [])
 
   const fetchDocuments = async () => {
-    const supabase = createClient()
     const { data, error } = await supabase
       .from('documents')
       .select('id, description, file_url, file_type, uploaded_at, user_id, users(full_name)')
-      .order('uploaded_at', { ascending: false })
 
-    if (error) console.error('فشل تحميل المستندات:', error.message)
-    else setDocs(data || [])
+    if (error) {
+      console.error('Error fetching documents:', error)
+      return []
+    }
+
+    return data || []
   }
 
   const deleteDocument = async (doc: DocumentWithUser) => {
