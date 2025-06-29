@@ -81,8 +81,6 @@ const FinanceCalculator = () => {
                 className="select-field w-full text-center text-black font-medium bg-white border border-gray-200 rounded-lg shadow-sm"
                 value={downPaymentRate}
                 onChange={(e) => setDownPaymentRate(Number(e.target.value))}
-                aria-label="نسبة الدفعة الأولى"
-                title="نسبة الدفعة الأولى"
               >
                 <option value="0.1">10%</option>
                 <option value="0.15">15%</option>
@@ -95,8 +93,6 @@ const FinanceCalculator = () => {
                 className="select-field w-full text-center text-black font-medium bg-white border border-gray-200 rounded-lg shadow-sm"
                 value={lastPaymentRate}
                 onChange={(e) => setLastPaymentRate(Number(e.target.value))}
-                aria-label="نسبة الدفعة الأخيرة"
-                title="نسبة الدفعة الأخيرة"
               >
                 <option value="0.1">10%</option>
                 <option value="0.15">15%</option>
@@ -109,8 +105,6 @@ const FinanceCalculator = () => {
                 className="select-field w-full text-center text-black font-medium bg-white border border-gray-200 rounded-lg shadow-sm"
                 value={months}
                 onChange={(e) => setMonths(Number(e.target.value))}
-                aria-label="مدة التقسيط"
-                title="مدة التقسيط"
               >
                 <option value="12">12 شهر</option>
                 <option value="24">24 شهر</option>
@@ -167,7 +161,7 @@ const FinanceCalculator = () => {
             </div>
           ) : (
             <div className="text-center text-black py-8">
-              أدخل البيانات واضغط على "احسب القسط" لعرض النتيجة
+              أدخل البيانات واضغط على &quot;احسب القسط&quot; لعرض النتيجة
             </div>
           )}
         </Card>
@@ -178,4 +172,4 @@ const FinanceCalculator = () => {
 
 export default function FinancePage() {
   return <FinanceCalculator />;
-} 
+}

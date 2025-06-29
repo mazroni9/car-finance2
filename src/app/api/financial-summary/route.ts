@@ -1,43 +1,40 @@
 import { NextResponse } from 'next/server';
 import { supabase } from '@/lib/services/supabase';
 
-interface FinancialSummary {
-  totalIncome: number;
-  totalExpenses: number;
-  netIncome: number;
-  period: string;
-}
-
-export async function GET(): Promise<NextResponse<FinancialSummary>> {
+export async function GET() {
   try {
-    const [entries, expenses] = await Promise.all([
-      supabase
-        .from('financial_entries')
-        .select('amount')
-        .gt('created_at', new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString()),
-      supabase
-        .from('finance_expenses')
-        .select('amount')
-        .gt('created_at', new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString())
-    ]);
+    const { data, error } = await supabase
+      .from('finance_models')
+      .select('*')
+      .order('created_at', { ascending: false });
 
-    if (entries.error) throw entries.error;
-    if (expenses.error) throw expenses.error;
+    if (error) throw error;
 
-    const totalIncome = entries.data?.reduce((sum, entry) => sum + (entry.amount || 0), 0) || 0;
-    const totalExpenses = expenses.data?.reduce((sum, expense) => sum + (expense.amount || 0), 0) || 0;
-
-    return NextResponse.json({
-      totalIncome,
-      totalExpenses,
-      netIncome: totalIncome - totalExpenses,
-      period: '30 days'
-    });
+    return NextResponse.json(data);
   } catch (error) {
-    console.error('Error fetching financial summary:', error);
+    console.error('Error fetching finance data:', error);
     return NextResponse.json(
-      { error: 'Failed to fetch financial summary' } as any,
+      { error: 'Failed to fetch finance data' },
       { status: 500 }
     );
   }
-} 
+}
+
+export async function POST(request: Request) {
+  try {
+    const body = await request.json();
+    const { error } = await supabase
+      .from('finance_models')
+      .insert(body);
+
+    if (error) throw error;
+
+    return NextResponse.json({ success: true });
+  } catch (error) {
+    console.error('Error creating finance model:', error);
+    return NextResponse.json(
+      { error: 'Failed to create finance model' },
+      { status: 500 }
+    );
+  }
+}
