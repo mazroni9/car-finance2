@@ -8,7 +8,17 @@ interface CarData {
     [key: string]: any;
   }
   
-  export const validateCarData = (data: any) => {
+  interface FinanceData {
+    priceCategory: number
+    downPaymentRate: number
+  }
+  
+  interface InstallmentPlan {
+    months: number
+    profit_rate: number
+  }
+  
+  export const validateCarData = (data: Record<string, unknown>): { isValid: boolean; errors: string[] } => {
     const requiredFields = ['make', 'model', 'year', 'price'];
     const errors = requiredFields.filter((field) => !data[field]);
   
@@ -18,7 +28,7 @@ interface CarData {
     };
   };
   
-  export const calculateFinancials = (data: any, plan: any) => {
+  export const calculateFinancials = (data: FinanceData, plan: InstallmentPlan) => {
     const downPayment = data.priceCategory * (data.downPaymentRate / 100);
     const monthlyIncome = (data.priceCategory - downPayment) / plan.months;
   

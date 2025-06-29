@@ -53,7 +53,9 @@ const FinanceCalculator = () => {
     <div className="max-w-4xl mx-auto space-y-6">
       <div className="glass-card p-6 bg-gradient-to-b from-blue-50 to-blue-100">
         <h1 className="text-3xl font-bold mb-2 text-center">حاسبة التمويل</h1>
-        <p className="text-lg text-black text-center">حساب الأقساط والأرباح بشكل فوري</p>
+        <p className="text-gray-600">
+          {`Don't worry about the details, we'll handle everything for you`}
+        </p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
