@@ -43,20 +43,30 @@ export default function DocumentsPage() {
     setLoadingId(doc.id)
 
     try {
-      const supabase = createClient()
-
       if (doc.file_type === 'image') {
         const publicId = extractCloudinaryPublicId(doc.file_url || '')
-        await axios.post('/api/delete-cloudinary', { publicId })
+        
+        const { error } = await supabase
+          .from('documents')
+          .delete()
+          .eq('id', doc.id)
+        
+        if (error) throw error
+        
+        // Delete from Cloudinary
+        await fetch('/api/delete-cloudinar', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ publicId })
+        })
       } else {
         const filename = doc.file_url?.split('/').pop()
         if (filename) await supabase.storage.from('documents').remove([filename])
       }
 
-      await supabase.from('documents').delete().eq('id', doc.id)
       await fetchDocuments()
-    } catch (err: any) {
-      console.error('فشل الحذف:', err.message)
+    } catch (error) {
+      console.error('Error deleting document:', error)
     } finally {
       setLoadingId(null)
     }
