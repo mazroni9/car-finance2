@@ -1,7 +1,14 @@
 import { NextResponse } from 'next/server';
 import { supabase } from '@/lib/services/supabase';
 
-export async function GET() {
+interface FinancialSummary {
+  totalIncome: number;
+  totalExpenses: number;
+  netIncome: number;
+  period: string;
+}
+
+export async function GET(): Promise<NextResponse<FinancialSummary>> {
   try {
     const [entries, expenses] = await Promise.all([
       supabase
@@ -29,7 +36,7 @@ export async function GET() {
   } catch (error) {
     console.error('Error fetching financial summary:', error);
     return NextResponse.json(
-      { error: 'Failed to fetch financial summary' },
+      { error: 'Failed to fetch financial summary' } as any,
       { status: 500 }
     );
   }
