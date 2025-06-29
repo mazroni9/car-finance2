@@ -13,6 +13,7 @@ interface QueryOptions {
   }
   limit?: number
   offset?: number
+  filters?: Record<string, unknown>
 }
 
 export async function queryTable<T extends TableName>(
@@ -20,6 +21,12 @@ export async function queryTable<T extends TableName>(
   options: QueryOptions = {}
 ): Promise<Row<T>[]> {
   let query = supabase.from(tableName).select('*')
+
+  if (options.filters) {
+    Object.entries(options.filters).forEach(([key, value]) => {
+      query = query.eq(key, value)
+    })
+  }
 
   if (options.orderBy) {
     query = query.order(options.orderBy.column, {

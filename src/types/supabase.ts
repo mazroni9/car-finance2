@@ -22,6 +22,29 @@ export interface Database {
           updated_at?: string;
         };
       };
+      transactions: {
+        Row: {
+          id: string;
+          amount: number;
+          description: string;
+          user_id: string;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          amount: number;
+          description: string;
+          user_id: string;
+          id?: string;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          amount?: number;
+          description?: string;
+          updated_at?: string;
+        };
+      };
       documents: {
         Row: {
           id: string;

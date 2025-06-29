@@ -18,22 +18,20 @@
 import { useEffect, useState } from 'react';
 import { createClient } from '@supabase/supabase-js';
 import { supabase } from '@/lib/services/supabase'
+import type { Database } from '@/types/supabase'
 
 const supabaseClient = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 );
 
+type Transaction = Database['public']['Tables']['transactions']['Row']
+
 interface DashboardStats {
   totalUsers: number
   totalTransactions: number
   totalRevenue: number
-  recentTransactions: Array<{
-    id: string
-    amount: number
-    description: string
-    created_at: string
-  }>
+  recentTransactions: Transaction[]
 }
 
 async function fetchDashboardStats(): Promise<DashboardStats> {
