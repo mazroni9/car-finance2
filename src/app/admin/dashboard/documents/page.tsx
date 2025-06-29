@@ -11,7 +11,6 @@ import React, { useEffect, useState } from 'react'
 import { supabase } from '@/lib/services/supabase'
 import type { Database } from '@/types/supabase'
 import Link from 'next/link'
-import axios from 'axios'
 
 type DocumentWithUser = Database['public']['Tables']['documents']['Row'] & {
   users: { full_name: string | null } | null
