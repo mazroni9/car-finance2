@@ -76,7 +76,7 @@ export default function SummarySection({ allMonthlyDetails, entries }: SummarySe
   // ✅ جمع سنوي
   const annualTotals: AnnualTotals = monthlyResults.reduce((acc, month) => {
     Object.keys(acc).forEach((key) => {
-      acc[key] += month[key] || 0;
+      acc[key as keyof AnnualTotals] += month[key as keyof AnnualTotals] || 0;
     });
     return acc;
   }, {
