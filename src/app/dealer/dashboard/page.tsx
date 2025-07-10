@@ -208,6 +208,16 @@ async function settleCarSale({
   platformWalletId,
   showroomWalletId,
   supabase
+}: {
+  carId: string;
+  buyerWalletId: string;
+  sellerWalletId: string;
+  price: number;
+  commission: number;
+  transferFee: number;
+  platformWalletId: string;
+  showroomWalletId: string;
+  supabase: any;
 }) {
   // 1. خصم المبلغ من المشتري
   await recordTransaction({
@@ -243,6 +253,6 @@ async function settleCarSale({
 }
 
 // دالة تسجيل معاملة واحدة
-async function recordTransaction(entry, supabase) {
+async function recordTransaction(entry: any, supabase: any) {
   await supabase.from('transactions').insert([entry]);
 }
