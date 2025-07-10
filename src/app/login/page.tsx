@@ -6,21 +6,22 @@ import { supabase } from '@/lib/supabase/client';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
   const router = useRouter();
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
+    setError('');
     try {
-      const { error } = await supabase.auth.signInWithPassword({
-        email,
-        password: 'mazbrothers123', // كلمة مرور افتراضية
-      });
+      const { error } = await supabase.auth.signInWithPassword({ email, password });
       if (error) throw error;
+      // بعد تسجيل الدخول يمكنك جلب بيانات المستخدم والتحقق من الدور
       router.push('/');
-    } catch (error) {
-      alert('حدث خطأ أثناء تسجيل الدخول');
+    } catch (error: any) {
+      setError(error.message || 'حدث خطأ أثناء تسجيل الدخول');
       console.error('Error logging in:', error);
     } finally {
       setLoading(false);
@@ -46,14 +47,29 @@ export default function LoginPage() {
                 name="email"
                 type="email"
                 required
-                className="appearance-none rounded relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
+                className="appearance-none rounded-t relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
                 placeholder="البريد الإلكتروني"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
               />
             </div>
+            <div>
+              <label htmlFor="password" className="sr-only">
+                كلمة المرور
+              </label>
+              <input
+                id="password"
+                name="password"
+                type="password"
+                required
+                className="appearance-none rounded-b relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
+                placeholder="كلمة المرور"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+              />
+            </div>
           </div>
-
+          {error && <div className="text-red-600 text-center">{error}</div>}
           <div>
             <button
               type="submit"
