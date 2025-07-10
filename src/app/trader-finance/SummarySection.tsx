@@ -1,9 +1,25 @@
 "use client";
 import React from 'react';
 
+type Detail = {
+  id: number;
+  capital: number;
+  operationsMonthly: number;
+  financingRate?: number;
+};
+
+type Entry = {
+  financingRate: number;
+  monthlySubscription: number;
+  subscribers?: number;
+  dealers?: number;
+  annualOperations?: number;
+  capitalPerDealer?: number;
+};
+
 type SummarySectionProps = {
-  allMonthlyDetails: any;
-  entries: any;
+  allMonthlyDetails: Record<string, Detail[]>;
+  entries: Entry[];
 };
 
 type AnnualTotals = {
@@ -24,7 +40,7 @@ export default function SummarySection({ allMonthlyDetails, entries }: SummarySe
   ];
 
   // ✅ يحسب نتائج شهر واحد
-  const calculateMonthlyResults = (details: any[], entries: any[]) => {
+  const calculateMonthlyResults = (details: Detail[], entries: Entry[]) => {
     const totalOperations = details.reduce(
       (sum, d) => sum + (Number(d.operationsMonthly) || 0), 0
     );
