@@ -66,7 +66,7 @@ export default function ResultsTable({ entries }: any) {
             </tr>
           </thead>
           <tbody>
-            {results.map((r, i) => (
+            {results.map((r: any, i: any) => (
               <tr key={i}>
                 <td className="border p-1 text-center">{r.financingRate}%</td>
                 <td className="border p-1 text-center">{Math.round(r.annualSubscriptions).toLocaleString()}</td>
