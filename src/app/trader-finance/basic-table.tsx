@@ -7,9 +7,17 @@ interface Entry {
 }
 
 interface Detail {
-  capital?: number;
-  operationsMonthly?: number;
-  financingRate?: number;
+  id: number;
+  capital: number;
+  operationsMonthly: number;
+  financingRate: number;
+}
+
+interface CalculatedRow extends Entry {
+  subscribers: number;
+  operations: number;
+  capital: number;
+  financedAmount: number;
 }
 
 export default function BasicTable({ entries, details }: { entries: Entry[]; details: Detail[] }) {
@@ -34,7 +42,7 @@ export default function BasicTable({ entries, details }: { entries: Entry[]; det
   );
 
   // ✅ يجمع كل مستوى التمويل
-  const getRowForRate = (entry: Entry) => {
+  const getRowForRate = (entry: Entry): CalculatedRow => {
     const matchingDetails = details.filter(
       (d) => Number(d.financingRate) === Number(entry.financingRate)
     );
