@@ -112,7 +112,7 @@ export default function DealerDashboard() {
     );
   }
 
-  if (!wallet || wallet.status !== 'active') {
+  if (!wallet) {
     return (
       <div className="max-w-md mx-auto mt-10 p-6 bg-white rounded-lg shadow-lg">
         <div className="text-center">

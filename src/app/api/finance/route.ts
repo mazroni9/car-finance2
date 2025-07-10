@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { supabase } from '@/lib/services/supabase';
-import { rateLimit } from '@/lib/rate-limit';
+import { checkRateLimit } from '@/lib/rate-limit';
 
 export async function GET() {
   try {
@@ -23,8 +23,11 @@ export async function GET() {
 
 export async function POST(request: Request) {
   try {
-    const { success } = await rateLimit();
-    if (!success) {
+    // استخدام checkRateLimit بدلاً من rateLimit
+    const ip = request.headers.get('x-forwarded-for') || 'unknown';
+    const allowed = await checkRateLimit(ip);
+    
+    if (!allowed) {
       return NextResponse.json(
         { error: 'Too many requests' },
         { status: 429 }

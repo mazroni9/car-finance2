@@ -9,7 +9,7 @@ export default function ManualRegistrationPage() {
   const [amount, setAmount] = useState(117);
   const [description, setDescription] = useState('');
   const [message, setMessage] = useState('');
-  const [showrooms, setShowrooms] = useState([]);
+  const [showrooms, setShowrooms] = useState<{ id: string; name: string }[]>([]);
 
   // Load showrooms for dropdown
   useEffect(() => {

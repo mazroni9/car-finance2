@@ -69,6 +69,7 @@ export default function CarDetailsPage({ params }: { params: { id: string } }) {
 
     async function fetchFee() {
       try {
+        if (!car) return;
         console.log('✅ إرسال سعر السيارة إلى الحساب:', car.price);
 
         const res = await fetch('/api/platform-fee/calculate', {

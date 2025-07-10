@@ -13,7 +13,7 @@ export default function Page() {
     { financingRate: 100, monthlySubscription: 2000 }
   ]);
 
-  const [details] = useState([]);
+  const [showrooms, setShowrooms] = useState<{ id: string; name: string }[]>([]);
 
   if (showFull) {
     return <TraderFinancePage />;
@@ -27,7 +27,7 @@ export default function Page() {
         </h1>
       </div>
 
-      <BasicTable entries={entries} details={details} />
+      <BasicTable entries={entries} details={showrooms} />
 
       <div className="flex justify-center mt-6">
         <button
