@@ -67,7 +67,7 @@ export default function TraderFinancePage() {
   };
 
   // ✅ دالة التحديث لبيانات شهر واحد
-  const updateMonthDetails = (month, newData) => {
+  const updateMonthDetails = (month: string, newData: any[]) => {
     setMonthlyDetails({
       ...monthlyDetails,
       [month]: newData
