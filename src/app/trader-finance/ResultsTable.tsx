@@ -14,7 +14,7 @@ type ResultsTableProps = {
   entries: Entry[];
 };
 
-export default function ResultsTable({ entries }: ResultsTableProps) {
+export default function ResultsTable({ entries }: any) {
   // ثابتات النظام
   const TRANSFER_FEE_PER_OPERATION = 117;
   const FLOOR_FEE_PER_OPERATION = 250;
