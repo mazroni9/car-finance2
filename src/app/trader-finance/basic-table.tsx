@@ -1,7 +1,18 @@
 "use client";
 import React from 'react';
 
-export default function BasicTable({ entries, details }) {
+interface Entry {
+  financingRate: number;
+  monthlySubscription: number;
+}
+
+interface Detail {
+  capital?: number;
+  operationsMonthly?: number;
+  financingRate?: number;
+}
+
+export default function BasicTable({ entries, details }: { entries: Entry[]; details: Detail[] }) {
 
   // ✅ يحسب مجموع رأس المال لهذا المستوى
   const totalCapital = details.reduce(
@@ -23,7 +34,7 @@ export default function BasicTable({ entries, details }) {
   );
 
   // ✅ يجمع كل مستوى التمويل
-  const getRowForRate = (entry) => {
+  const getRowForRate = (entry: Entry) => {
     const matchingDetails = details.filter(
       (d) => Number(d.financingRate) === Number(entry.financingRate)
     );
