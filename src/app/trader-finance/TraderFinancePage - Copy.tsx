@@ -4,11 +4,18 @@ import BasicTable from './basic-table';
 import DetailsTable from './details-table';
 import SummarySection from './SummarySection';
 
+type MonthlyDetails = Record<string, any[]>;
+
 export default function TraderFinancePage() {
   const months = [
     'يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو',
     'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر'
   ];
+
+  const initialMonthlyDetails: MonthlyDetails = months.reduce((acc, month) => {
+    acc[month] = [];
+    return acc;
+  }, {} as MonthlyDetails);
 
   const [selectedMonth, setSelectedMonth] = useState('يناير');
 
@@ -19,12 +26,7 @@ export default function TraderFinancePage() {
     { financingRate: 100, monthlySubscription: 2000 }
   ]);
 
-  const [monthlyDetails, setMonthlyDetails] = useState<Record<string, any[]>>(
-    months.reduce((acc, month) => {
-      acc[month] = [];
-      return acc;
-    }, {} as Record<string, any[]>)
-  );
+  const [monthlyDetails, setMonthlyDetails] = useState<MonthlyDetails>(initialMonthlyDetails);
 
   const [saveMessage, setSaveMessage] = useState('');
 
