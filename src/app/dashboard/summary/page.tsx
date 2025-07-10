@@ -40,7 +40,7 @@ export default function DashboardHome() {
   );
 }
 
-function Card({ title, value, color }: { title: string, value: any, color: string }) {
+function Card({ title, value, color }: { title: string, value: string | number, color: string }) {
   return (
     <div className={`rounded-lg shadow-md p-6 ${color}`}>
       <h2 className="text-xl font-semibold">{title}</h2>

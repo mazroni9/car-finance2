@@ -7,6 +7,8 @@ import DealerSalesHistory from '@/components/DealerSalesHistory';
 import MyCarsList from '@/components/MyCarsList';
 import AvailableCars from '@/components/AvailableCars';
 import Image from 'next/image';
+import type { User } from '@supabase/supabase-js';
+import { SupabaseClient } from '@supabase/supabase-js';
 
 interface DealerWallet {
   id: string;
@@ -26,6 +28,17 @@ interface DealerTransaction {
   created_at: string;
 }
 
+interface TransactionEntry {
+  wallet_id: string;
+  amount: number;
+  type: string;
+  meta: {
+    car_id: string;
+    to?: string;
+    from?: string;
+  };
+}
+
 type SettleCarSaleParams = {
   carId: string;
   buyerWalletId: string;
@@ -35,8 +48,12 @@ type SettleCarSaleParams = {
   transferFee: number;
   platformWalletId: string;
   showroomWalletId: string;
-  supabase: any;
+  supabase: SupabaseClient;
 };
+
+interface DealerDashboardProps {
+  supabase: SupabaseClient;
+}
 
 export default function DealerDashboard() {
   const [wallet, setWallet] = useState<DealerWallet | null>(null);
@@ -255,6 +272,6 @@ async function settleCarSale({
 }
 
 // دالة تسجيل معاملة واحدة
-async function recordTransaction(entry: any, supabase: any) {
+async function recordTransaction(entry: TransactionEntry, supabase: SupabaseClient) {
   await supabase.from('transactions').insert([entry]);
 }
