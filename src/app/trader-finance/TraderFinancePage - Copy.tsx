@@ -75,7 +75,7 @@ export default function TraderFinancePage() {
   };
 
   // ✅ دالة حساب النتائج الشهرية
-  const calculateMonthlyResults = (details, entries) => {
+  const calculateMonthlyResults = (details: any[], entries: any[]) => {
     const totalOperations = details.reduce(
       (sum, d) => sum + (Number(d.operationsMonthly) || 0),
       0
