@@ -4,6 +4,15 @@ import BasicTable from './basic-table';
 import DetailsTable from './details-table';
 import SummarySection from './SummarySection';
 
+type Detail = {
+  id: number;
+  capital: number;
+  operationsMonthly: number;
+  financingRate: number;
+};
+
+type MonthlyDetails = Record<string, Detail[]>;
+
 export default function TraderFinancePage() {
   const months = [
     'يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو',
@@ -18,8 +27,6 @@ export default function TraderFinancePage() {
     { financingRate: 75, monthlySubscription: 1500 },
     { financingRate: 100, monthlySubscription: 2000 }
   ]);
-
-  type MonthlyDetails = Record<string, any[]>;
 
   const initialMonthlyDetails: MonthlyDetails = months.reduce((acc, month) => {
     acc[month] = [];
@@ -56,13 +63,13 @@ export default function TraderFinancePage() {
     const empty = months.reduce((acc, month) => {
       acc[month] = [];
       return acc;
-    }, {} as Record<string, any[]>);
+    }, {} as MonthlyDetails);
     setMonthlyDetails(empty);
     setSaveMessage('🗑️ تم مسح كل البيانات!');
     setTimeout(() => setSaveMessage(''), 3000);
   };
 
-  const updateMonthDetails = (month: string, newData: any[]) => {
+  const updateMonthDetails = (month: string, newData: Detail[]) => {
     setMonthlyDetails({
       ...monthlyDetails,
       [month]: newData
