@@ -13,7 +13,7 @@ type InputTableProps = {
   financingRate: number;
 };
 
-export default function InputTable({ details, setDetails, financingRate }: InputTableProps) {
+export default function InputTable({ details, setDetails, financingRate }: any) {
   const handleChange = (index: number, field: keyof Detail, value: string | number) => {
     const newDetails = [...details];
     newDetails[index][field] = typeof value === 'string' ? Number(value) : value;
