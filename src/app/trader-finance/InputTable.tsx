@@ -51,7 +51,7 @@ export default function InputTable({ details, setDetails, financingRate }: any) 
             </tr>
           </thead>
           <tbody>
-            {details.map((row, i) => {
+            {details.map((row: any, i: number) => {
               const coverageValue = (Number(row.capital) || 0) * (financingRate / 100);
               return (
                 <tr key={i}>
