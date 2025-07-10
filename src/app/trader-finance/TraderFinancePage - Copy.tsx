@@ -19,11 +19,11 @@ export default function TraderFinancePage() {
     { financingRate: 100, monthlySubscription: 2000 }
   ]);
 
-  const [monthlyDetails, setMonthlyDetails] = useState(
+  const [monthlyDetails, setMonthlyDetails] = useState<Record<string, any[]>>(
     months.reduce((acc, month) => {
       acc[month] = [];
       return acc;
-    }, {})
+    }, {} as Record<string, any[]>)
   );
 
   const [saveMessage, setSaveMessage] = useState('');
