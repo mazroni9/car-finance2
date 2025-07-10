@@ -1,7 +1,12 @@
 "use client";
 import React from 'react';
 
-export default function SummarySection({ allMonthlyDetails, entries }) {
+type SummarySectionProps = {
+  allMonthlyDetails: any;
+  entries: any;
+};
+
+export default function SummarySection({ allMonthlyDetails, entries }: SummarySectionProps) {
   const months = [
     'يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو',
     'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر'
