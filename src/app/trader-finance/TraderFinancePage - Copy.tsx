@@ -4,7 +4,28 @@ import BasicTable from './basic-table';
 import DetailsTable from './details-table';
 import SummarySection from './SummarySection';
 
-type MonthlyDetails = Record<string, any[]>;
+type Detail = {
+  id: number;
+  capital: number;
+  operationsMonthly: number;
+  financingRate: number;
+};
+
+type MonthlyDetails = Record<string, Detail[]>;
+
+type Entry = {
+  financingRate: number;
+  monthlySubscription: number;
+};
+
+type MonthlyResults = {
+  totalOperations: number;
+  totalCapital: number;
+  transferFees: number;
+  floorFees: number;
+  subscriptions: number;
+  netProfit: number;
+};
 
 export default function TraderFinancePage() {
   const months = [
@@ -19,7 +40,7 @@ export default function TraderFinancePage() {
 
   const [selectedMonth, setSelectedMonth] = useState('يناير');
 
-  const [entries, setEntries] = useState([
+  const [entries, setEntries] = useState<Entry[]>([
     { financingRate: 25, monthlySubscription: 500 },
     { financingRate: 50, monthlySubscription: 1000 },
     { financingRate: 75, monthlySubscription: 1500 },
@@ -67,7 +88,7 @@ export default function TraderFinancePage() {
   };
 
   // ✅ دالة التحديث لبيانات شهر واحد
-  const updateMonthDetails = (month: string, newData: any[]) => {
+  const updateMonthDetails = (month: string, newData: Detail[]) => {
     setMonthlyDetails({
       ...monthlyDetails,
       [month]: newData
@@ -75,7 +96,7 @@ export default function TraderFinancePage() {
   };
 
   // ✅ دالة حساب النتائج الشهرية
-  const calculateMonthlyResults = (details: any[], entries: any[]) => {
+  const calculateMonthlyResults = (details: Detail[], entries: Entry[]): MonthlyResults => {
     const totalOperations = details.reduce(
       (sum, d) => sum + (Number(d.operationsMonthly) || 0),
       0
