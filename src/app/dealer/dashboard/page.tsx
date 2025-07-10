@@ -26,6 +26,18 @@ interface DealerTransaction {
   created_at: string;
 }
 
+type SettleCarSaleParams = {
+  carId: string;
+  buyerWalletId: string;
+  sellerWalletId: string;
+  price: number;
+  commission: number;
+  transferFee: number;
+  platformWalletId: string;
+  showroomWalletId: string;
+  supabase: any;
+};
+
 export default function DealerDashboard() {
   const [wallet, setWallet] = useState<DealerWallet | null>(null);
   const [transactions, setTransactions] = useState<DealerTransaction[]>([]);
@@ -208,17 +220,7 @@ async function settleCarSale({
   platformWalletId,
   showroomWalletId,
   supabase
-}: {
-  carId: string;
-  buyerWalletId: string;
-  sellerWalletId: string;
-  price: number;
-  commission: number;
-  transferFee: number;
-  platformWalletId: string;
-  showroomWalletId: string;
-  supabase: any;
-}) {
+}: SettleCarSaleParams) {
   // 1. خصم المبلغ من المشتري
   await recordTransaction({
     wallet_id: buyerWalletId,
