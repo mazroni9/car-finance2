@@ -92,16 +92,9 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
 
     return NextResponse.json({ success: true, message: "تمت العملية بنجاح" });
 
-  } catch (error: any) {
-    console.error('خطأ أثناء معالجة الطلب:', error);
-
-    // ✅ 10 – محاولة إرجاع أي معاملة معلقة
-    const supabase = supabaseClient();
-    await supabase.rpc('rollback_transaction');
-
-    return NextResponse.json({
-      success: false,
-      message: error?.message || "حدث خطأ غير متوقع"
-    });
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : 'خطأ غير متوقع';
+    console.error('Error:', errorMessage);
+    return NextResponse.json({ error: errorMessage }, { status: 500 });
   }
 }

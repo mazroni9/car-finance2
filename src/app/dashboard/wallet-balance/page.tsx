@@ -26,8 +26,9 @@ export default function WalletBalancePage() {
       setMessage('✅ تمت العملية بنجاح!');
       setAmount(0);
       setShowroomId('');
-    } catch (err: any) {
-      setMessage(`❌ خطأ: ${err.message}`);
+    } catch (err: unknown) {
+      const errorMessage = err instanceof Error ? err.message : 'خطأ غير متوقع';
+      console.error('Error:', errorMessage);
     }
   };
 

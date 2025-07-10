@@ -67,11 +67,9 @@ export default function ShowroomManualRegistrationPage() {
         initialPayment: '',
       });
 
-    } catch (error: any) {
-      setMessage({
-        type: 'error',
-        text: `❌ حدث خطأ: ${error.message}`
-      });
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'خطأ غير متوقع';
+      console.error('Error:', errorMessage);
     } finally {
       setLoading(false);
     }

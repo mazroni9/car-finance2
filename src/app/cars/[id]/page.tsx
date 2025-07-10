@@ -120,9 +120,9 @@ export default function CarDetailsPage({ params }: { params: { id: string } }) {
         alert(data.error || 'حدث خطأ أثناء تنفيذ الشراء');
         setError(data.error || 'حدث خطأ أثناء تنفيذ الشراء');
       }
-    } catch (e: any) {
-      alert('فشل الاتصال بالخادم');
-      setError(e.message);
+    } catch (e: unknown) {
+      const errorMessage = e instanceof Error ? e.message : 'خطأ غير متوقع';
+      console.error('Error:', errorMessage);
     } finally {
       setConfirming(false);
     }
@@ -157,6 +157,7 @@ export default function CarDetailsPage({ params }: { params: { id: string } }) {
                 key={idx}
                 onClick={() => setSelectedImage(img)}
                 className={`border rounded-lg p-1 ${selectedImage === img ? "border-blue-600" : "border-gray-200"}`}
+                aria-label={`صورة مصغرة ${idx + 1}`}
               >
                 <Image src={img} alt="صورة مصغرة" width={80} height={60} className="object-cover rounded" />
               </button>

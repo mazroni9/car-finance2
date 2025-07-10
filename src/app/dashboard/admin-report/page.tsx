@@ -27,9 +27,10 @@ export default function AdminReportPage() {
         }
         const json = await res.json();
         setData(json);
-      } catch (err: any) {
-        console.error('Error:', err);
-        setError(err.message);
+      } catch (err: unknown) {
+        const errorMessage = err instanceof Error ? err.message : 'خطأ غير متوقع';
+        console.error('Error:', errorMessage);
+        setError(errorMessage);
       } finally {
         setLoading(false);
       }

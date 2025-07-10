@@ -62,10 +62,12 @@ export default function ManualRegistrationPage() {
         initialBalance: '',
       });
 
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'خطأ غير متوقع';
+      console.error('Error:', errorMessage);
       setMessage({
         type: 'error',
-        text: `❌ حدث خطأ: ${error.message}`
+        text: `❌ حدث خطأ: ${errorMessage}`
       });
     } finally {
       setLoading(false);
