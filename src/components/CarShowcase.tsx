@@ -11,13 +11,19 @@ interface Car {
   created_at?: string;
 }
 
-export default function CarShowcase() {
-  const [cars, setCars] = useState<Car[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+interface CarShowcaseProps {
+  cars?: Car[];
+}
+
+export default function CarShowcase({ cars: propCars }: CarShowcaseProps) {
+  const [cars, setCars] = useState<Car[]>(propCars || []);
+  const [isLoading, setIsLoading] = useState(!propCars);
 
   useEffect(() => {
-    fetchCars();
-  }, []);
+    if (!propCars) {
+      fetchCars();
+    }
+  }, [propCars]);
 
   async function fetchCars() {
     try {
