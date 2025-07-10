@@ -5,6 +5,7 @@ type Detail = {
   id: number;
   capital: number;
   operationsMonthly: number;
+  financingRate: number;
 };
 
 type InputTableProps = {
@@ -13,7 +14,7 @@ type InputTableProps = {
   financingRate: number;
 };
 
-export default function InputTable({ details, setDetails, financingRate }: any) {
+export default function InputTable({ details, setDetails, financingRate }: InputTableProps) {
   const handleChange = (index: number, field: keyof Detail, value: string | number) => {
     const newDetails = [...details];
     newDetails[index][field] = typeof value === 'string' ? Number(value) : value;
@@ -26,7 +27,8 @@ export default function InputTable({ details, setDetails, financingRate }: any) 
       {
         id: details.length + 1,
         capital: 0,
-        operationsMonthly: 0
+        operationsMonthly: 0,
+        financingRate: financingRate
       }
     ]);
   };
@@ -51,7 +53,7 @@ export default function InputTable({ details, setDetails, financingRate }: any) 
             </tr>
           </thead>
           <tbody>
-            {details.map((row: any, i: number) => {
+            {details.map((row: Detail, i: number) => {
               const coverageValue = (Number(row.capital) || 0) * (financingRate / 100);
               return (
                 <tr key={i}>
@@ -62,6 +64,7 @@ export default function InputTable({ details, setDetails, financingRate }: any) 
                       value={row.capital}
                       onChange={(e) => handleChange(i, 'capital', e.target.value)}
                       className="w-full p-1 border rounded"
+                      aria-label="رأس المال"
                     />
                   </td>
                   <td className="border p-1 text-center">{financingRate}%</td>
@@ -72,6 +75,7 @@ export default function InputTable({ details, setDetails, financingRate }: any) 
                       value={row.operationsMonthly}
                       onChange={(e) => handleChange(i, 'operationsMonthly', e.target.value)}
                       className="w-full p-1 border rounded"
+                      aria-label="عدد العمليات الشهرية"
                     />
                   </td>
                   <td className="border p-1 text-center">
