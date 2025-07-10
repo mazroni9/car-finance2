@@ -115,8 +115,9 @@ export default function CarEntryForm({ className = "" }: { className?: string })
       setImages([]);
       setReport(null);
       setRegistration(null);
-    } catch (e: any) {
-      setError(e.message);
+    } catch (e: unknown) {
+      const errorMessage = e instanceof Error ? e.message : 'خطأ غير متوقع';
+      setError(errorMessage);
     } finally {
       setLoading(false);
     }
@@ -154,7 +155,7 @@ export default function CarEntryForm({ className = "" }: { className?: string })
         </div>
         <div>
           <label className="block text-gray-700 font-semibold mb-1 flex items-center gap-1">نوع الوقود</label>
-          <select name="fuel_type" value={form.fuel_type} onChange={handleChange} className="border border-gray-300 rounded-lg px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-200">
+          <select name="fuel_type" value={form.fuel_type} onChange={handleChange} className="border border-gray-300 rounded-lg px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-200" aria-label="نوع الوقود">
             <option value="بنزين">بنزين</option>
             <option value="ديزل">ديزل</option>
             <option value="كهرباء">كهرباء</option>
@@ -163,7 +164,7 @@ export default function CarEntryForm({ className = "" }: { className?: string })
         </div>
         <div>
           <label className="block text-gray-700 font-semibold mb-1 flex items-center gap-1">نوع القير</label>
-          <select name="transmission" value={form.transmission} onChange={handleChange} className="border border-gray-300 rounded-lg px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-200">
+          <select name="transmission" value={form.transmission} onChange={handleChange} className="border border-gray-300 rounded-lg px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-200" aria-label="نوع القير">
             <option value="أوتوماتيك">أوتوماتيك</option>
             <option value="عادي">عادي</option>
           </select>
@@ -174,15 +175,15 @@ export default function CarEntryForm({ className = "" }: { className?: string })
         </div>
         <div className="md:col-span-2">
           <label className="block text-gray-700 font-semibold mb-1 flex items-center gap-1">صور السيارة</label>
-          <input type="file" accept="image/*" multiple onChange={handleImagesChange} className="border border-gray-300 rounded-lg px-3 py-2 w-full bg-white" required />
+          <input type="file" accept="image/*" multiple onChange={handleImagesChange} className="border border-gray-300 rounded-lg px-3 py-2 w-full bg-white" required aria-label="صور السيارة" />
         </div>
         <div className="md:col-span-2">
           <label className="block text-gray-700 font-semibold mb-1 flex items-center gap-1">التقرير الفني (PDF)</label>
-          <input type="file" accept="application/pdf" onChange={handleReportChange} className="border border-gray-300 rounded-lg px-3 py-2 w-full bg-white" />
+          <input type="file" accept="application/pdf" onChange={handleReportChange} className="border border-gray-300 rounded-lg px-3 py-2 w-full bg-white" aria-label="التقرير الفني" />
         </div>
         <div className="md:col-span-2">
           <label className="block text-gray-700 font-semibold mb-1 flex items-center gap-1">استمارة السيارة (صورة، اختياري)</label>
-          <input type="file" accept="image/*" onChange={handleRegistrationChange} className="border border-gray-300 rounded-lg px-3 py-2 w-full bg-white" />
+          <input type="file" accept="image/*" onChange={handleRegistrationChange} className="border border-gray-300 rounded-lg px-3 py-2 w-full bg-white" aria-label="استمارة السيارة" />
         </div>
       </div>
       {error && <div className="text-red-600 text-center">{error}</div>}

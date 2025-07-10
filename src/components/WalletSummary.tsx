@@ -25,9 +25,10 @@ export default function WalletSummary() {
         }
 
         setWallet(json.wallet);
-      } catch (err: any) {
+      } catch (err: unknown) {
         console.error(err);
-        setError(err.message || 'خطأ غير متوقع');
+        const errorMessage = err instanceof Error ? err.message : 'خطأ غير متوقع';
+        setError(errorMessage);
       } finally {
         setLoading(false);
       }
