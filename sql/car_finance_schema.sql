@@ -1,4 +1,3 @@
-
 -- إنشاء جدول العملاء
 CREATE TABLE customers (
     id SERIAL PRIMARY KEY,
@@ -8,21 +7,51 @@ CREATE TABLE customers (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- جدول السيارات
-CREATE TABLE cars (
-    id SERIAL PRIMARY KEY,
-    model TEXT NOT NULL,
-    brand TEXT,
-    year INT,
-    price NUMERIC(12, 2),
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+-- جدول السيارات (محدث)
+DROP TABLE IF EXISTS cars;
+CREATE TABLE car_showcase (
+    id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+    make text NOT NULL,      -- الشركة المصنعة
+    model text NOT NULL,     -- الموديل
+    year int4 NOT NULL,      -- سنة الصنع
+    price numeric NOT NULL,  -- السعر الأساسي
+    image_url text NULL,     -- صورة رئيسية
+    images text[] NULL,      -- روابط صور متعددة (Cloudinary)
+    color text NULL,         -- اللون
+    mileage numeric NULL,    -- المسافة المقطوعة
+    fuel_type text NULL,     -- نوع الوقود
+    transmission text NULL DEFAULT 'أوتوماتيك'::text,
+    status text NULL DEFAULT 'available'::text,
+    seller_id uuid NULL,     -- معرف المعرض
+    created_at timestamp DEFAULT CURRENT_TIMESTAMP,
+    updated_at timestamp DEFAULT CURRENT_TIMESTAMP
 );
 
--- جدول طلبات التمويل
+-- إضافة Indexes للبحث السريع
+CREATE INDEX idx_car_showcase_seller ON car_showcase(seller_id);
+CREATE INDEX idx_car_showcase_status ON car_showcase(status);
+CREATE INDEX idx_car_showcase_price ON car_showcase(price);
+CREATE INDEX idx_car_showcase_year ON car_showcase(year);
+
+-- Trigger لتحديث updated_at
+CREATE OR REPLACE FUNCTION update_car_showcase_updated_at()
+RETURNS TRIGGER AS $$
+BEGIN
+    NEW.updated_at = CURRENT_TIMESTAMP;
+    RETURN NEW;
+END;
+$$ language 'plpgsql';
+
+CREATE TRIGGER update_car_showcase_timestamp
+    BEFORE UPDATE ON car_showcase
+    FOR EACH ROW
+    EXECUTE FUNCTION update_car_showcase_updated_at();
+
+-- جدول طلبات التمويل (تحديث المرجع للسيارات)
 CREATE TABLE financing_requests (
     id SERIAL PRIMARY KEY,
     customer_id INTEGER REFERENCES customers(id),
-    car_id INTEGER REFERENCES cars(id),
+    car_id uuid REFERENCES car_showcase(id),  -- تحديث نوع المعرف
     down_payment NUMERIC(12,2),
     final_payment NUMERIC(12,2),
     monthly_payment NUMERIC(12,2),
@@ -102,16 +131,18 @@ VALUES
   ('سارة المانع', '0559876543', '1023456789');
 
 -- بيانات أولية للسيارات
-INSERT INTO cars (model, brand, year, price)
+INSERT INTO car_showcase (make, model, year, price, image_url, images, color, mileage, fuel_type)
 VALUES 
-  ('Camry', 'Toyota', 2021, 75000),
-  ('Sonata', 'Hyundai', 2022, 82000);
+  ('Toyota', 'Camry', 2021, 75000, 'https://example.com/camry.jpg', ARRAY['https://example.com/camry1.jpg', 'https://example.com/camry2.jpg'], 'أبيض', 15000, 'بنزين'),
+  ('Hyundai', 'Sonata', 2022, 82000, 'https://example.com/sonata.jpg', ARRAY['https://example.com/sonata1.jpg', 'https://example.com/sonata2.jpg'], 'أسود', 10000, 'بنزين'),
+  ('Honda', 'Accord', 2023, 95000, 'https://example.com/accord.jpg', ARRAY['https://example.com/accord1.jpg', 'https://example.com/accord2.jpg'], 'فضي', 5000, 'هايبرد'),
+  ('Hyundai', 'Elantra', 2022, 68000, 'https://example.com/elantra.jpg', ARRAY['https://example.com/elantra1.jpg', 'https://example.com/elantra2.jpg'], 'أحمر', 20000, 'بنزين');
 
 -- بيانات أولية لطلبات التمويل
 INSERT INTO financing_requests (customer_id, car_id, down_payment, final_payment, monthly_payment, financing_percentage, term_months)
 VALUES 
-  (1, 1, 15000, 10000, 2000, 50.00, 24),
-  (2, 2, 18000, 12000, 2500, 40.00, 30);
+  (1, '00000000-0000-0000-0000-000000000001', 15000, 10000, 2000, 50.00, 24),
+  (2, '00000000-0000-0000-0000-000000000002', 18000, 12000, 2500, 40.00, 30);
 
 -- بيانات أولية للمستثمرين
 INSERT INTO investors (full_name, phone_number, email, national_id, wallet_balance)
@@ -140,3 +171,52 @@ INSERT INTO investor_profits (investment_id, profit_amount, distributed_on, rein
 VALUES
   (1, 3750, CURRENT_DATE + INTERVAL '90 days', FALSE),
   (2, 3125, CURRENT_DATE + INTERVAL '60 days', TRUE);
+
+-- تحديث function لحساب الملخص المالي
+CREATE OR REPLACE FUNCTION get_financial_summary()
+RETURNS TABLE (
+    total_monthly_installments NUMERIC,
+    total_annual_income NUMERIC,
+    total_purchase_cost NUMERIC,
+    total_profit_full_period NUMERIC,
+    avg_roi_full_period NUMERIC,
+    avg_roi_annual NUMERIC,
+    total_down_payments NUMERIC,
+    total_last_payments_per_year NUMERIC,
+    total_annual_profit_before_costs NUMERIC
+) AS $$
+BEGIN
+    RETURN QUERY
+    WITH summary AS (
+        SELECT 
+            SUM(monthly_payment) as total_monthly,
+            SUM(down_payment) as total_down,
+            SUM(final_payment) as total_final,
+            SUM(price) as total_cost,  -- تحديث للتناسب مع الجدول الجديد
+            COUNT(*) as total_requests,
+            AVG(financing_percentage) as avg_financing
+        FROM financing_requests fr
+        JOIN car_showcase c ON fr.car_id = c.id
+        WHERE fr.status = 'approved'
+    )
+    SELECT
+        summary.total_monthly,
+        (summary.total_monthly * 12) as yearly_income,
+        summary.total_cost,
+        ((summary.total_monthly * 12) + summary.total_down + summary.total_final - summary.total_cost) as full_period_profit,
+        CASE 
+            WHEN summary.total_cost > 0 
+            THEN (((summary.total_monthly * 12) + summary.total_down + summary.total_final - summary.total_cost) / summary.total_cost)
+            ELSE 0 
+        END as roi_full_period,
+        CASE 
+            WHEN summary.total_cost > 0 
+            THEN (((summary.total_monthly * 12) - summary.total_cost) / summary.total_cost)
+            ELSE 0 
+        END as roi_annual,
+        summary.total_down,
+        summary.total_final,
+        ((summary.total_monthly * 12) - summary.total_cost) as annual_profit_before_costs
+    FROM summary;
+END;
+$$ LANGUAGE plpgsql;

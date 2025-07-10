@@ -1,6 +1,5 @@
 import { NextResponse } from 'next/server';
 import supabase from '@/lib/services/supabase';
-import { validateCarData, calculateFinancials } from '@/lib/utils/finance';
 import { queryTable } from '@/lib/services/queries';
 import { rateLimit } from '@/lib/rate-limit';
 
@@ -9,8 +8,8 @@ const limiter = rateLimit({
   uniqueTokenPerInterval: 500
 });
 
-// الحصول على جميع السيارات
-export async function GET() {
+// الحصول على جميع السيارات أو سيارة واحدة حسب id
+export async function GET(request: Request) {
   try {
     // التحقق من حد الطلبات
     try {
@@ -22,17 +21,26 @@ export async function GET() {
       );
     }
 
-    const cars = await queryTable('cars', {
-      columns: `
-        *,
-        installment_plans (
-          months,
-          profit_rate
-        )
-      `,
+    const { searchParams } = new URL(request.url);
+    const id = searchParams.get('id');
+
+    if (id) {
+      // جلب سيارة واحدة فقط
+      const cars = await queryTable('car_showcase', {
+        filters: { id },
+        limit: 1
+      });
+      if (!cars || cars.length === 0) {
+        return NextResponse.json(null, { status: 404 });
+      }
+      return NextResponse.json(cars[0]);
+    }
+
+    // جلب جميع السيارات
+    const cars = await queryTable('car_showcase', {
       orderBy: {
-        column: 'price_category',
-        ascending: true
+        column: 'created_at',
+        ascending: false
       }
     });
 
@@ -61,49 +69,28 @@ export async function POST(request: Request) {
 
     const data = await request.json();
     
-    // التحقق من صحة البيانات
-    const validation = validateCarData(data);
-    if (!validation.isValid) {
+    // التحقق من صحة البيانات الأساسية
+    if (!data.make || !data.model || !data.price) {
       return NextResponse.json(
-        { error: 'بيانات غير صحيحة', details: validation.errors },
+        { error: 'بيانات غير صحيحة: يجب توفير الشركة المصنعة والموديل والسعر' },
         { status: 400 }
       );
     }
-
-    // الحصول على معلومات خطة التقسيط
-    const plans = await queryTable('installment_plans', {
-      filters: { id: data.installmentPlanId }
-    });
-
-    if (!plans.length) {
-      return NextResponse.json(
-        { error: 'خطة التقسيط غير موجودة' },
-        { status: 400 }
-      );
-    }
-
-    const plan = plans[0];
-
-    // حساب القيم المالية
-    const financials = calculateFinancials(data, plan);
 
     // إضافة السيارة
     const { data: newCar, error: insertError } = await supabase
-      .from('cars')
+      .from('car_showcase')
       .insert({
-        price_category: data.priceCategory,
-        quantity: data.quantity,
-        down_payment_rate: data.downPaymentRate,
-        down_payment: financials.downPayment,
-        last_payment: financials.downPayment,
-        monthly_income: financials.monthlyIncome,
-        annual_income: financials.annualIncome,
-        inspection_cost: data.inspectionCost,
-        warranty_cost: data.warrantyCost,
-        tracking_cost: data.trackingCost,
-        purchase_cost: data.priceCategory * data.quantity,
-        selling_price: financials.sellingPrice,
-        installment_plan_id: data.installmentPlanId
+        make: data.make || 'غير محدد',
+        model: data.model || 'غير محدد',
+        year: data.year || new Date().getFullYear(),
+        price: data.price || 0,
+        color: data.color || 'غير محدد',
+        mileage: data.mileage || 0,
+        fuel_type: data.fuelType || 'بنزين',
+        transmission: data.transmission || 'أوتوماتيك',
+        status: 'available',
+        seller_id: data.sellerId || null
       })
       .select()
       .single();
@@ -114,34 +101,6 @@ export async function POST(request: Request) {
         { error: 'فشل في إضافة السيارة', details: insertError.message },
         { status: 500 }
       );
-    }
-
-    // تحديث الملخص المالي
-    const { error: updateError } = await supabase
-      .from('financial_summaries')
-      .update({
-        total_annual_income: supabase.rpc('increment', { 
-          value: financials.annualIncome 
-        }),
-        inspection_expense: supabase.rpc('increment', { 
-          value: data.inspectionCost * data.quantity 
-        }),
-        warranty_expense: supabase.rpc('increment', { 
-          value: data.warrantyCost * data.quantity 
-        }),
-        tracking_expense: supabase.rpc('increment', { 
-          value: data.trackingCost * data.quantity 
-        }),
-        net_profit: supabase.rpc('calculate_net_profit', {
-          new_income: financials.annualIncome,
-          new_cost: (data.inspectionCost + data.warrantyCost + data.trackingCost) * data.quantity
-        })
-      })
-      .eq('id', 1);
-
-    if (updateError) {
-      console.error('Failed to update financial summary:', updateError);
-      // Don't return error to client as the car was successfully added
     }
 
     return NextResponse.json(newCar);

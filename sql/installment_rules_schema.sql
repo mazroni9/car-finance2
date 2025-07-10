@@ -1,4 +1,3 @@
-
 -- جدول قواعد التسعير حسب شريحة السعر
 CREATE TABLE pricing_rules (
     id SERIAL PRIMARY KEY,
@@ -38,6 +37,54 @@ CREATE TABLE financed_vehicles (
     delivered_at TIMESTAMP
 );
 
+-- جدول قواعد التقسيط
+DROP TABLE IF EXISTS installment_rules;
+
+CREATE TABLE installment_rules (
+    id SERIAL PRIMARY KEY,
+    price_category NUMERIC(12,2) NOT NULL,
+    duration_months INTEGER NOT NULL,
+    profit_target_percent NUMERIC(5,2) NOT NULL,
+    down_payment_value NUMERIC(12,2) NOT NULL,
+    last_payment_value NUMERIC(12,2) NOT NULL,
+    quantity INTEGER NOT NULL DEFAULT 1,
+    monthly_installment NUMERIC(12,2) NOT NULL,
+    monthly_income NUMERIC(12,2) GENERATED ALWAYS AS (
+        monthly_installment * quantity
+    ) STORED,
+    annual_income NUMERIC(12,2) GENERATED ALWAYS AS (
+        monthly_installment * quantity * 12
+    ) STORED,
+    possible_purchase_amount NUMERIC(12,2) NOT NULL,
+    tracking_cost NUMERIC(12,2) NOT NULL DEFAULT 0,
+    guarantee_contract_cost NUMERIC(12,2) NOT NULL DEFAULT 0,
+    inspection_cost NUMERIC(12,2) NOT NULL DEFAULT 0,
+    profit_per_car NUMERIC(12,2) NOT NULL,
+    annual_profit NUMERIC(12,2) GENERATED ALWAYS AS (
+        CASE 
+            WHEN duration_months = 12 THEN profit_per_car * quantity
+            WHEN duration_months = 18 THEN (profit_per_car * quantity) / 1.5
+            WHEN duration_months = 24 THEN (profit_per_car * quantity) / 2
+            ELSE 0
+        END
+    ) STORED,
+    total_profit_full_period NUMERIC(12,2) GENERATED ALWAYS AS (
+        profit_per_car * quantity
+    ) STORED,
+    roi_full_period NUMERIC(5,2) GENERATED ALWAYS AS (
+        (profit_per_car / possible_purchase_amount) * 100
+    ) STORED,
+    roi_annual NUMERIC(5,2) GENERATED ALWAYS AS (
+        CASE 
+            WHEN duration_months = 12 THEN (profit_per_car / possible_purchase_amount) * 100
+            WHEN duration_months = 18 THEN ((profit_per_car / possible_purchase_amount) * 100) / 1.5
+            WHEN duration_months = 24 THEN ((profit_per_car / possible_purchase_amount) * 100) / 2
+            ELSE 0
+        END
+    ) STORED,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
 
 -- بيانات أولية للقواعد
 
@@ -126,3 +173,17 @@ BEGIN
          (((car_price - (car_price * down_payment_percent / 100) - (car_price * final_payment_percent / 100)) * profit_rate * term_months / 12) / 100)) / term_months, 2);
 END;
 $$ LANGUAGE plpgsql;
+
+-- Trigger to update updated_at timestamp
+CREATE OR REPLACE FUNCTION update_updated_at_column()
+RETURNS TRIGGER AS $$
+BEGIN
+    NEW.updated_at = CURRENT_TIMESTAMP;
+    RETURN NEW;
+END;
+$$ language 'plpgsql';
+
+CREATE TRIGGER update_installment_rules_updated_at
+    BEFORE UPDATE ON installment_rules
+    FOR EACH ROW
+    EXECUTE FUNCTION update_updated_at_column();

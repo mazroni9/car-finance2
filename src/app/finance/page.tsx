@@ -1,175 +1,165 @@
 'use client';
 
 import { useState } from 'react';
-import { Card } from '@/components/ui/card';
+import Link from 'next/link';
 
-interface CalculationResult {
-  downPayment: number;
-  lastPayment: number;
-  remainingAmount: number;
-  monthlyPayment: number;
-  totalAmount: number;
-  profitAmount: number;
-  profitRate: number;
-  months: number;
-}
-
-const FinanceCalculator = () => {
-  const [priceCategory, setPriceCategory] = useState(0);
-  const [downPaymentRate, setDownPaymentRate] = useState(0.1);
-  const [lastPaymentRate, setLastPaymentRate] = useState(0.1);
-  const [months, setMonths] = useState(12);
-  const [result, setResult] = useState<CalculationResult | null>(null);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-
-  const handleCalculate = async () => {
-    try {
-      setLoading(true);
-      setError(null);
-
-      const response = await fetch('/api/finance/calculate', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          priceCategory,
-          downPaymentRate,
-          lastPaymentRate,
-          months,
-        }),
-      });
-
-      const data = await response.json();
-      if (!response.ok) throw new Error(data.error || 'حدث خطأ في الحساب');
-      setResult(data.data);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'حدث خطأ غير متوقع');
-    } finally {
-      setLoading(false);
-    }
-  };
+export default function FinanceCalculator() {
+  const [carPrice, setCarPrice] = useState('');
+  const [downPaymentPercent, setDownPaymentPercent] = useState(10);
+  const [lastPaymentPercent, setLastPaymentPercent] = useState(20);
+  const [months, setMonths] = useState(24);
 
   return (
-    <div className="max-w-4xl mx-auto space-y-6">
-      <div className="glass-card p-6 bg-gradient-to-b from-blue-50 to-blue-100">
-        <h1 className="text-3xl font-bold mb-2 text-center">حاسبة التمويل</h1>
-        <div className="text-center">
-          <h2 className="text-2xl font-bold mb-2">Car Finance Calculator</h2>
-          <p className="text-gray-600">
-            Don&apos;t worry about the details, we&apos;ll handle everything for you
-          </p>
-        </div>
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <Card className="p-6 w-full max-w-md mx-auto bg-gradient-to-br from-blue-50 to-white shadow-md">
-          <h2 className="text-2xl font-bold mb-6 text-center">حاسبة التمويل</h2>
-          <div className="space-y-4">
-            <div className="text-center">
-              <label className="block text-sm font-bold mb-2 text-black">سعر السيارة</label>
-              <input
-                type="number"
-                className="input-field w-full text-center text-black font-medium bg-white border border-gray-200 rounded-lg shadow-sm"
-                value={priceCategory || ''}
-                onChange={(e) => setPriceCategory(Number(e.target.value))}
-                placeholder="مثال: 50000"
-              />
-            </div>
-            <div className="text-center">
-              <label className="block text-sm font-bold mb-2 text-black">نسبة الدفعة الأولى</label>
-              <select
-                className="select-field w-full text-center text-black font-medium bg-white border border-gray-200 rounded-lg shadow-sm"
-                value={downPaymentRate}
-                onChange={(e) => setDownPaymentRate(Number(e.target.value))}
-              >
-                <option value="0.1">10%</option>
-                <option value="0.15">15%</option>
-                <option value="0.2">20%</option>
-              </select>
-            </div>
-            <div className="text-center">
-              <label className="block text-sm font-bold mb-2 text-black">نسبة الدفعة الأخيرة</label>
-              <select
-                className="select-field w-full text-center text-black font-medium bg-white border border-gray-200 rounded-lg shadow-sm"
-                value={lastPaymentRate}
-                onChange={(e) => setLastPaymentRate(Number(e.target.value))}
-              >
-                <option value="0.1">10%</option>
-                <option value="0.15">15%</option>
-                <option value="0.2">20%</option>
-              </select>
-            </div>
-            <div className="text-center">
-              <label className="block text-sm font-bold mb-2 text-black">مدة التقسيط</label>
-              <select
-                className="select-field w-full text-center text-black font-medium bg-white border border-gray-200 rounded-lg shadow-sm"
-                value={months}
-                onChange={(e) => setMonths(Number(e.target.value))}
-              >
-                <option value="12">12 شهر</option>
-                <option value="24">24 شهر</option>
-                <option value="36">36 شهر</option>
-              </select>
-            </div>
-            <button
-              className="button-primary w-full mt-4 bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg shadow-md"
-              onClick={handleCalculate}
-              disabled={loading}
+    <div className="min-h-screen bg-gray-50 py-8">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+        {/* Navigation Buttons */}
+        <div className="flex justify-end gap-4 mb-8">
+          <Link
+            href="/"
+            className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors"
+          >
+            <span>العودة للرئيسية</span>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="w-4 h-4"
+              viewBox="0 0 20 20"
+              fill="currentColor"
             >
-              {loading ? 'جاري الحساب...' : 'احسب القسط'}
-            </button>
-            {error && <div className="error-message text-center text-red-600">{error}</div>}
-          </div>
-        </Card>
+              <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z" />
+            </svg>
+          </Link>
+        </div>
 
-        <Card className="p-6 w-full max-w-md mx-auto bg-gradient-to-br from-blue-50 to-white shadow-md">
-          <h2 className="text-2xl font-bold mb-6 text-center">نتيجة الحساب</h2>
-          {result ? (
-            <div className="space-y-4">
-              <div className="flex justify-between items-center">
-                <span className="text-sm font-bold text-black">الدفعة الأولى ({(downPaymentRate * 100)}%)</span>
-                <span className="text-black font-medium">{result.downPayment.toLocaleString()} ريال</span>
-              </div>
-              <div className="flex justify-between items-center">
-                <span className="text-sm font-bold text-black">الدفعة الأخيرة ({(lastPaymentRate * 100)}%)</span>
-                <span className="text-black font-medium">{result.lastPayment.toLocaleString()} ريال</span>
-              </div>
-              <div className="flex justify-between items-center">
-                <span className="text-sm font-bold text-black">المبلغ المتبقي للتقسيط</span>
-                <span className="text-black font-medium">{result.remainingAmount.toLocaleString()} ريال</span>
-              </div>
-              <div className="flex justify-between items-center">
-                <span className="text-sm font-bold text-black">القسط الشهري</span>
-                <span className="text-black font-medium">{result.monthlyPayment.toLocaleString()} ريال</span>
-              </div>
-              <div className="flex justify-between items-center">
-                <span className="text-sm font-bold text-black">إجمالي المبلغ</span>
-                <span className="text-black font-medium">{result.totalAmount.toLocaleString()} ريال</span>
-              </div>
-              <div className="flex justify-between items-center">
-                <span className="text-sm font-bold text-black">مبلغ الربح</span>
-                <span className="text-black font-medium">{result.profitAmount.toLocaleString()} ريال</span>
-              </div>
-              <div className="flex justify-between items-center">
-                <span className="text-sm font-bold text-black">نسبة الربح</span>
-                <span className="text-black font-medium">{result.profitRate}%</span>
-              </div>
-              <div className="flex justify-between items-center">
-                <span className="text-sm font-bold text-black">مدة التقسيط</span>
-                <span className="text-black font-medium">{result.months} شهر</span>
+        {/* Header */}
+        <div className="bg-blue-600 rounded-xl shadow-lg overflow-hidden mb-8">
+          <div className="p-8 text-center">
+            <h1 className="text-3xl font-bold text-white mb-2">حاسبة التمويل</h1>
+            <h2 className="text-xl text-blue-100 mb-2">Car Finance Calculator</h2>
+            <p className="text-blue-100">لا تقلق بشأن التفاصيل، سنقوم بكل شيء من أجلك</p>
+          </div>
+        </div>
+
+        {/* Main Content */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          {/* Input Form */}
+          <div className="bg-white rounded-xl shadow-lg overflow-hidden">
+            <div className="p-6">
+              <h3 className="text-xl font-semibold text-gray-900 mb-6">بيانات التمويل</h3>
+              <div className="space-y-6">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    سعر السيارة
+                  </label>
+                  <div className="relative">
+                    <input
+                      type="number"
+                      value={carPrice}
+                      onChange={(e) => setCarPrice(e.target.value)}
+                      placeholder="مثال: 50000"
+                      className="block w-full px-4 py-3 text-gray-900 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                      dir="rtl"
+                    />
+                    <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500">
+                      ريال
+                    </span>
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    نسبة الدفعة الأولى
+                  </label>
+                  <select
+                    value={downPaymentPercent}
+                    onChange={(e) => setDownPaymentPercent(Number(e.target.value))}
+                    className="block w-full px-4 py-3 text-gray-900 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white"
+                    dir="rtl"
+                  >
+                    <option value={10}>10%</option>
+                    <option value={15}>15%</option>
+                    <option value={20}>20%</option>
+                    <option value={25}>25%</option>
+                    <option value={30}>30%</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    نسبة الدفعة الأخيرة
+                  </label>
+                  <select
+                    value={lastPaymentPercent}
+                    onChange={(e) => setLastPaymentPercent(Number(e.target.value))}
+                    className="block w-full px-4 py-3 text-gray-900 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white"
+                    dir="rtl"
+                  >
+                    <option value={10}>10%</option>
+                    <option value={15}>15%</option>
+                    <option value={20}>20%</option>
+                    <option value={25}>25%</option>
+                    <option value={30}>30%</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    مدة التمويل (بالشهور)
+                  </label>
+                  <select
+                    value={months}
+                    onChange={(e) => setMonths(Number(e.target.value))}
+                    className="block w-full px-4 py-3 text-gray-900 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white"
+                    dir="rtl"
+                  >
+                    <option value={12}>12 شهر</option>
+                    <option value={24}>24 شهر</option>
+                    <option value={36}>36 شهر</option>
+                    <option value={48}>48 شهر</option>
+                  </select>
+                </div>
+
+                <button
+                  onClick={() => {/* احسب القسط */}}
+                  className="w-full bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors"
+                >
+                  احسب القسط
+                </button>
               </div>
             </div>
-          ) : (
-            <div className="text-center text-black py-8">
-              أدخل البيانات واضغط على &quot;احسب القسط&quot; لعرض النتيجة
+          </div>
+
+          {/* Results */}
+          <div className="bg-white rounded-xl shadow-lg overflow-hidden">
+            <div className="p-6">
+              <h3 className="text-xl font-semibold text-gray-900 mb-6">نتيجة الحساب</h3>
+              {carPrice ? (
+                <div className="space-y-4">
+                  <div className="p-4 bg-gray-50 rounded-lg">
+                    <div className="text-sm text-gray-600">الدفعة الأولى</div>
+                    <div className="text-lg font-semibold">{(Number(carPrice) * (downPaymentPercent / 100)).toLocaleString()} ريال</div>
+                  </div>
+                  <div className="p-4 bg-gray-50 rounded-lg">
+                    <div className="text-sm text-gray-600">القسط الشهري</div>
+                    <div className="text-lg font-semibold">{((Number(carPrice) - (Number(carPrice) * (downPaymentPercent / 100)) - (Number(carPrice) * (lastPaymentPercent / 100))) / months).toLocaleString()} ريال</div>
+                  </div>
+                  <div className="p-4 bg-gray-50 rounded-lg">
+                    <div className="text-sm text-gray-600">الدفعة الأخيرة</div>
+                    <div className="text-lg font-semibold">{(Number(carPrice) * (lastPaymentPercent / 100)).toLocaleString()} ريال</div>
+                  </div>
+                  <div className="p-4 bg-gray-50 rounded-lg">
+                    <div className="text-sm text-gray-600">إجمالي المبلغ</div>
+                    <div className="text-lg font-semibold">{Number(carPrice).toLocaleString()} ريال</div>
+                  </div>
+                </div>
+              ) : (
+                <div className="text-center text-gray-500 py-8">
+                  أدخل البيانات واضغط على "احسب القسط" لعرض النتيجة
+                </div>
+              )}
             </div>
-          )}
-        </Card>
+          </div>
+        </div>
       </div>
     </div>
   );
-};
-
-export default function FinancePage() {
-  return <FinanceCalculator />;
 }

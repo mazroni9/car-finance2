@@ -49,7 +49,7 @@ export default function CarFinanceDashboard() {
         setLoading(true);
         const [carsResponse, summaryResponse] = await Promise.all([
           fetch('/api/cars'),
-          fetch('/api/financial-summary')
+          fetch('/api/finance/summary')
         ]);
         
         if (!carsResponse.ok || !summaryResponse.ok) {

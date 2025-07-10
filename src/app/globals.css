@@ -2,6 +2,34 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Add custom styles for RTL inputs and selects */
+select, input {
+  text-align: right !important;
+}
+
+select option {
+  text-align: right !important;
+  direction: rtl !important;
+}
+
+/* Fix select appearance */
+select {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3E%3Cpath stroke='%236B7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3E%3C/svg%3E");
+  background-position: left 0.5rem center;
+  background-repeat: no-repeat;
+  background-size: 1.5em 1.5em;
+  padding-left: 2.5rem;
+}
+
+/* Ensure text is visible */
+select, input, option {
+  color: #111827 !important; /* text-gray-900 */
+  font-size: 1rem !important;
+}
+
 :root {
   --primary: #2563eb;
   --secondary: #64748b;

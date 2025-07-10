@@ -1,81 +1,79 @@
 "use client";
 
-import { useState } from 'react';
-import { Input } from './ui/input';
-import { Select } from './ui/select';
-import { Button } from './ui/button';
-import { Card, CardHeader, CardContent } from './ui/card';
+import { useState } from "react";
 
-interface CarData {
+interface CarForm {
+  make: string;
   model: string;
   year: number;
-  purchasePrice: number;
-  category: 'economy' | 'mid' | 'luxury';
-  ownershipTransferFee: number;
-  purchaseCommission: number;
-  insurance: number;
-  repairs: number;
-  inspectionCost: number;
-  warrantyCost: number;
-  trackingCost: number;
-  additionalCosts: number;
-  notes: string;
+  price: number;
+  color: string;
+  mileage: number;
+  fuel_type: string;
+  transmission: string;
+  description: string;
+  image_url: string[];
+  technical_report_url?: string;
+  registration_image_url?: string;
 }
 
-const defaultCarData: CarData = {
-  model: '',
+const initialState: CarForm = {
+  make: "",
+  model: "",
   year: new Date().getFullYear(),
-  purchasePrice: 0,
-  category: 'economy',
-  ownershipTransferFee: 382, // ثابتة
-  purchaseCommission: 200, // تتغير حسب الفئة
-  insurance: 0,
-  repairs: 0,
-  inspectionCost: 300,
-  warrantyCost: 500,
-  trackingCost: 250,
-  additionalCosts: 0,
-  notes: ''
+  price: 0,
+  color: "",
+  mileage: 0,
+  fuel_type: "بنزين",
+  transmission: "أوتوماتيك",
+  description: "",
+  image_url: [],
 };
 
-export default function CarEntryForm() {
-  const [formData, setFormData] = useState<CarData>(defaultCarData);
+export default function CarEntryForm({ className = "" }: { className?: string }) {
+  const [form, setForm] = useState<CarForm>(initialState);
+  const [images, setImages] = useState<File[]>([]);
+  const [report, setReport] = useState<File | null>(null);
+  const [registration, setRegistration] = useState<File | null>(null);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  // حساب العمولة حسب فئة السيارة
-  const calculateCommission = (category: string) => {
-    switch (category) {
-      case 'economy': return 200;
-      case 'mid': return 300;
-      case 'luxury': return 400;
-      default: return 200;
+  // رفع ملف إلى Cloudinary
+  const uploadToCloudinary = async (file: File, folder: string) => {
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("upload_preset", "ml_default"); // يجب ضبط upload_preset في Cloudinary
+    formData.append("folder", folder);
+    const res = await fetch("https://api.cloudinary.com/v1_1/dzbaenadw/upload", {
+      method: "POST",
+      body: formData,
+    });
+    const data = await res.json();
+    return data.secure_url as string;
+  };
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+    const { name, value } = e.target;
+    setForm((prev) => ({ ...prev, [name]: name === "year" || name === "price" || name === "mileage" ? Number(value) : value }));
+  };
+
+  const handleImagesChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files) {
+      setImages(Array.from(e.target.files));
     }
   };
 
-  // حساب إجمالي التكاليف
-  const calculateTotalCost = () => {
-    const total = 
-      formData.purchasePrice +
-      formData.ownershipTransferFee +
-      formData.purchaseCommission +
-      formData.insurance +
-      formData.repairs +
-      formData.inspectionCost +
-      formData.warrantyCost +
-      formData.trackingCost +
-      formData.additionalCosts;
-    
-    return total;
+  const handleReportChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      setReport(e.target.files[0]);
+    }
   };
 
-  const handleCategoryChange = (category: CarData['category']) => {
-    setFormData({
-      ...formData,
-      category,
-      purchaseCommission: calculateCommission(category)
-    });
+  const handleRegistrationChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      setRegistration(e.target.files[0]);
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -83,205 +81,115 @@ export default function CarEntryForm() {
     setLoading(true);
     setError(null);
     setSuccess(false);
-
     try {
-      const response = await fetch('/api/cars', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+      // رفع الصور
+      let imageUrls: string[] = [];
+      for (const img of images) {
+        const url = await uploadToCloudinary(img, "cars");
+        imageUrls.push(url);
+      }
+      // رفع التقرير الفني
+      let reportUrl = "";
+      if (report) {
+        reportUrl = await uploadToCloudinary(report, "car_reports");
+      }
+      // رفع استمارة السيارة
+      let registrationUrl = "";
+      if (registration) {
+        registrationUrl = await uploadToCloudinary(registration, "car_registrations");
+      }
+      // إرسال البيانات إلى API
+      const res = await fetch("/api/cars", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          ...formData,
-          totalCost: calculateTotalCost()
+          ...form,
+          image_url: imageUrls,
+          technical_report_url: reportUrl || undefined,
+          registration_image_url: registrationUrl || undefined,
         }),
       });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'فشل في إضافة السيارة');
-      }
-
+      if (!res.ok) throw new Error("فشل في إضافة السيارة");
       setSuccess(true);
-      setFormData(defaultCarData);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'حدث خطأ غير متوقع');
+      setForm(initialState);
+      setImages([]);
+      setReport(null);
+      setRegistration(null);
+    } catch (e: any) {
+      setError(e.message);
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <Card>
-      <CardHeader>
-        <h2 className="text-2xl font-bold">إضافة سيارة جديدة للمخزون</h2>
-        {error && (
-          <div className="error-message mt-2">
-            {error}
-          </div>
-        )}
-        {success && (
-          <div className="mt-2 p-2 bg-green-500/20 text-green-700 rounded-lg">
-            تم إضافة السيارة بنجاح
-          </div>
-        )}
-      </CardHeader>
-      <CardContent>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label className="form-label">موديل السيارة</label>
-              <Input
-                type="text"
-                value={formData.model}
-                onChange={(e) => setFormData({ ...formData, model: e.target.value })}
-                required
-                placeholder="مثال: تويوتا كامري"
-              />
-            </div>
-
-            <div>
-              <label className="form-label">سنة الصنع</label>
-              <Input
-                type="number"
-                value={formData.year}
-                onChange={(e) => setFormData({ ...formData, year: Number(e.target.value) })}
-                required
-                min={2000}
-                max={new Date().getFullYear() + 1}
-              />
-            </div>
-
-            <div>
-              <label className="form-label">سعر الشراء</label>
-              <Input
-                type="number"
-                value={formData.purchasePrice}
-                onChange={(e) => setFormData({ ...formData, purchasePrice: Number(e.target.value) })}
-                required
-                placeholder="مثال: 50000"
-              />
-            </div>
-
-            <div>
-              <label className="form-label">فئة السيارة</label>
-              <Select
-                value={formData.category}
-                onChange={(e) => handleCategoryChange(e.target.value as CarData['category'])}
-                required
-              >
-                <option value="economy">اقتصادية</option>
-                <option value="mid">متوسطة</option>
-                <option value="luxury">فاخرة</option>
-              </Select>
-            </div>
-
-            <div>
-              <label className="form-label">رسوم نقل الملكية</label>
-              <Input
-                type="number"
-                value={formData.ownershipTransferFee}
-                disabled
-              />
-            </div>
-
-            <div>
-              <label className="form-label">عمولة الشراء</label>
-              <Input
-                type="number"
-                value={formData.purchaseCommission}
-                disabled
-              />
-            </div>
-
-            <div>
-              <label className="form-label">تكلفة التأمين</label>
-              <Input
-                type="number"
-                value={formData.insurance}
-                onChange={(e) => setFormData({ ...formData, insurance: Number(e.target.value) })}
-                placeholder="أدخل تكلفة التأمين"
-              />
-            </div>
-
-            <div>
-              <label className="form-label">تكاليف الإصلاحات</label>
-              <Input
-                type="number"
-                value={formData.repairs}
-                onChange={(e) => setFormData({ ...formData, repairs: Number(e.target.value) })}
-                placeholder="تكاليف الإصلاحات إن وجدت"
-              />
-            </div>
-
-            <div>
-              <label className="form-label">تكلفة الفحص</label>
-              <Input
-                type="number"
-                value={formData.inspectionCost}
-                onChange={(e) => setFormData({ ...formData, inspectionCost: Number(e.target.value) })}
-              />
-            </div>
-
-            <div>
-              <label className="form-label">تكلفة الضمان</label>
-              <Input
-                type="number"
-                value={formData.warrantyCost}
-                onChange={(e) => setFormData({ ...formData, warrantyCost: Number(e.target.value) })}
-              />
-            </div>
-
-            <div>
-              <label className="form-label">تكلفة التتبع</label>
-              <Input
-                type="number"
-                value={formData.trackingCost}
-                onChange={(e) => setFormData({ ...formData, trackingCost: Number(e.target.value) })}
-              />
-            </div>
-
-            <div>
-              <label className="form-label">تكاليف إضافية</label>
-              <Input
-                type="number"
-                value={formData.additionalCosts}
-                onChange={(e) => setFormData({ ...formData, additionalCosts: Number(e.target.value) })}
-                placeholder="أي تكاليف إضافية"
-              />
-            </div>
-          </div>
-
-          <div>
-            <label className="form-label">ملاحظات</label>
-            <textarea
-              className="input-field h-24"
-              value={formData.notes}
-              onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
-              placeholder="أي ملاحظات إضافية عن السيارة"
-            />
-          </div>
-
-          <div className="flex justify-between items-center mt-6">
-            <div className="text-lg">
-              <span className="font-bold">إجمالي التكلفة: </span>
-              <span className="text-primary">{calculateTotalCost().toLocaleString()} ريال</span>
-            </div>
-            <div className="flex gap-4">
-              <Button
-                type="button"
-                variant="secondary"
-                onClick={() => setFormData(defaultCarData)}
-                disabled={loading}
-              >
-                إعادة تعيين
-              </Button>
-              <Button type="submit" variant="primary" disabled={loading}>
-                {loading ? 'جاري الإضافة...' : 'إضافة السيارة'}
-              </Button>
-            </div>
-          </div>
-        </form>
-      </CardContent>
-    </Card>
+    <form onSubmit={handleSubmit} className={`bg-white/80 rounded-2xl shadow-2xl p-8 max-w-xl w-full mx-auto border border-gray-200 backdrop-blur-md ${className}`}>
+      <h2 className="text-2xl font-bold text-center mb-6 text-blue-900 flex items-center justify-center gap-2">
+        🚗 ادخل بيانات سيارتك
+      </h2>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <label className="block text-gray-700 font-semibold mb-1 flex items-center gap-1">الماركة</label>
+          <input name="make" value={form.make} onChange={handleChange} className="border border-gray-300 rounded-lg px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-200" placeholder="مثال: تويوتا" required />
+        </div>
+        <div>
+          <label className="block text-gray-700 font-semibold mb-1 flex items-center gap-1">الموديل</label>
+          <input name="model" value={form.model} onChange={handleChange} className="border border-gray-300 rounded-lg px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-200" placeholder="مثال: كامري" required />
+        </div>
+        <div>
+          <label className="block text-gray-700 font-semibold mb-1 flex items-center gap-1">السنة</label>
+          <input name="year" type="number" value={form.year} onChange={handleChange} className="border border-gray-300 rounded-lg px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-200" placeholder="2024" required />
+        </div>
+        <div>
+          <label className="block text-gray-700 font-semibold mb-1 flex items-center gap-1">السعر</label>
+          <input name="price" type="number" value={form.price} onChange={handleChange} className="border border-gray-300 rounded-lg px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-200" placeholder="مثال: 95000" required />
+        </div>
+        <div>
+          <label className="block text-gray-700 font-semibold mb-1 flex items-center gap-1">اللون</label>
+          <input name="color" value={form.color} onChange={handleChange} className="border border-gray-300 rounded-lg px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-200" placeholder="أبيض" required />
+        </div>
+        <div>
+          <label className="block text-gray-700 font-semibold mb-1 flex items-center gap-1">المسافة المقطوعة (كم)</label>
+          <input name="mileage" type="number" value={form.mileage} onChange={handleChange} className="border border-gray-300 rounded-lg px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-200" placeholder="0" required />
+        </div>
+        <div>
+          <label className="block text-gray-700 font-semibold mb-1 flex items-center gap-1">نوع الوقود</label>
+          <select name="fuel_type" value={form.fuel_type} onChange={handleChange} className="border border-gray-300 rounded-lg px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-200">
+            <option value="بنزين">بنزين</option>
+            <option value="ديزل">ديزل</option>
+            <option value="كهرباء">كهرباء</option>
+            <option value="هايبرد">هايبرد</option>
+          </select>
+        </div>
+        <div>
+          <label className="block text-gray-700 font-semibold mb-1 flex items-center gap-1">نوع القير</label>
+          <select name="transmission" value={form.transmission} onChange={handleChange} className="border border-gray-300 rounded-lg px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-200">
+            <option value="أوتوماتيك">أوتوماتيك</option>
+            <option value="عادي">عادي</option>
+          </select>
+        </div>
+        <div className="md:col-span-2">
+          <label className="block text-gray-700 font-semibold mb-1 flex items-center gap-1">الوصف</label>
+          <textarea name="description" value={form.description} onChange={handleChange} className="border border-gray-300 rounded-lg px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-200" rows={2} placeholder="أي ملاحظات إضافية..." />
+        </div>
+        <div className="md:col-span-2">
+          <label className="block text-gray-700 font-semibold mb-1 flex items-center gap-1">صور السيارة</label>
+          <input type="file" accept="image/*" multiple onChange={handleImagesChange} className="border border-gray-300 rounded-lg px-3 py-2 w-full bg-white" required />
+        </div>
+        <div className="md:col-span-2">
+          <label className="block text-gray-700 font-semibold mb-1 flex items-center gap-1">التقرير الفني (PDF)</label>
+          <input type="file" accept="application/pdf" onChange={handleReportChange} className="border border-gray-300 rounded-lg px-3 py-2 w-full bg-white" />
+        </div>
+        <div className="md:col-span-2">
+          <label className="block text-gray-700 font-semibold mb-1 flex items-center gap-1">استمارة السيارة (صورة، اختياري)</label>
+          <input type="file" accept="image/*" onChange={handleRegistrationChange} className="border border-gray-300 rounded-lg px-3 py-2 w-full bg-white" />
+        </div>
+      </div>
+      {error && <div className="text-red-600 text-center">{error}</div>}
+      {success && <div className="text-green-600 text-center">تمت إضافة السيارة بنجاح!</div>}
+      <button type="submit" disabled={loading} className="w-full py-3 bg-blue-700 hover:bg-blue-800 text-white font-bold rounded-xl shadow-lg text-lg transition-all duration-200 disabled:opacity-50 mt-4 flex items-center justify-center gap-2">
+        {loading ? "جاري الإضافة..." : <><span>إضافة السيارة</span> 🚀</>}
+      </button>
+    </form>
   );
 } 

@@ -22,6 +22,49 @@ export interface Database {
           updated_at?: string;
         };
       };
+      dealer_wallets: {
+        Row: {
+          id: string;
+          dealer_id: string;
+          balance: number;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          dealer_id: string;
+          balance: number;
+          id?: string;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          balance?: number;
+          updated_at?: string;
+        };
+      };
+      dealer_transactions: {
+        Row: {
+          id: string;
+          wallet_id: string;
+          amount: number;
+          type: 'credit' | 'debit';
+          description: string;
+          created_at: string;
+        };
+        Insert: {
+          wallet_id: string;
+          amount: number;
+          type: 'credit' | 'debit';
+          description: string;
+          id?: string;
+          created_at?: string;
+        };
+        Update: {
+          amount?: number;
+          type?: 'credit' | 'debit';
+          description?: string;
+        };
+      };
       transactions: {
         Row: {
           id: string;

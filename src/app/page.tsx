@@ -1,84 +1,73 @@
-'use client';
-
 import Link from 'next/link';
-import type { ReactNode } from 'react';
+import CarEntryForm from '@/components/CarEntryForm';
+import CarImageSlider from '@/components/CarImageSlider';
+import AvailableCars from '@/components/AvailableCars';
+import FinanceCalculator from '@/app/finance/page';
 
-export default function HomePage(): ReactNode {
+export default function HomePage() {
   return (
-    <div className="space-y-8">
+    <div className="space-y-8 mt-10">
       {/* Hero Section */}
       <div className="glass-card p-8 bg-gradient-to-br from-blue-100 to-blue-50 shadow-md text-center">
-        <h1 className="text-4xl font-bold mb-4 text-black">نظام تمويل السيارات</h1>
+        <h1 className="text-4xl font-bold mb-4 text-black">
+          أهلاً بكم في معرض شركة محمد أحمد الزهراني وإخوانه للسيارات
+        </h1>
         <p className="text-xl text-black opacity-90 mb-6">
-          حلول تمويل مرنة وميسرة لشراء سيارة أحلامك
+          نقل ملكية، بيع سيارات مستعملة، ونظام التأجير
         </p>
-        <div className="flex justify-center gap-4">
-          <Link 
-            href="/cars"
-            className="button-primary text-lg px-8 py-3"
-          >
-            تصفح السيارات
+        <div className="flex justify-center flex-wrap gap-4">
+          <Link href="/cars" className="bg-blue-600 hover:bg-blue-700 text-white font-bold text-lg px-8 py-3 rounded-lg shadow-md">
+            تصفح سيارات المعرض
           </Link>
-          <Link 
-            href="/finance"
-            className="button-secondary text-lg px-8 py-3"
-          >
-            احسب التمويل
+          <Link href="/trader-finance" className="bg-blue-600 hover:bg-blue-700 text-white font-bold text-lg px-8 py-3 rounded-lg shadow-md">
+            تمويل التاجر
+          </Link>
+          <Link href="/car-finance" className="bg-blue-600 hover:bg-blue-700 text-white font-bold text-lg px-8 py-3 rounded-lg shadow-md">
+            نظام التأجير
           </Link>
         </div>
       </div>
 
-      {/* Features Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="glass-card p-6 bg-gradient-to-br from-green-100 to-green-50 shadow-md">
-          <h3 className="text-xl font-bold mb-3 text-black">معرض السيارات</h3>
-          <p className="text-black opacity-90 mb-4">
-            تصفح مجموعة متنوعة من السيارات الحديثة المتاحة للتمويل
-          </p>
-          <Link href="/cars" className="text-green-700 hover:text-green-800 font-bold">
-            استعرض المعرض →
-          </Link>
-        </div>
-
-        <div className="glass-card p-6 bg-gradient-to-br from-blue-100 to-blue-50 shadow-md">
-          <h3 className="text-xl font-bold mb-3 text-black">حاسبة التمويل</h3>
-          <p className="text-black opacity-90 mb-4">
-            احسب قسطك الشهري وتفاصيل التمويل بكل سهولة
-          </p>
-          <Link href="/finance" className="text-blue-700 hover:text-blue-800 font-bold">
-            احسب الآن →
-          </Link>
-        </div>
-
-        <div className="glass-card p-6 bg-gradient-to-br from-purple-100 to-purple-50 shadow-md">
-          <h3 className="text-xl font-bold mb-3 text-black">لوحة التحكم</h3>
-          <p className="text-black opacity-90 mb-4">
-            تابع عمليات التمويل وإدارة المبيعات بشكل فعال
-          </p>
-          <Link href="/dashboard" className="text-purple-700 hover:text-purple-800 font-bold">
-            عرض اللوحة →
-          </Link>
+      {/* Grid Layout: سلايدر صور السيارات */}
+      <div className="flex flex-col items-center justify-center my-8">
+        <div className="w-full max-w-3xl">
+          <CarImageSlider />
         </div>
       </div>
 
-      {/* Statistics Section */}
-      <div className="glass-card p-8 bg-gradient-to-br from-gray-100 to-gray-50 shadow-md">
-        <h2 className="text-2xl font-bold mb-6 text-center text-black">إحصائيات سريعة</h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-center">
-          <div>
-            <div className="text-3xl font-bold text-black">+1000</div>
-            <p className="text-black opacity-90">عميل راضٍ</p>
-          </div>
-          <div>
-            <div className="text-3xl font-bold text-black">+500</div>
-            <p className="text-black opacity-90">سيارة تم تمويلها</p>
-          </div>
-          <div>
-            <div className="text-3xl font-bold text-black">24/7</div>
-            <p className="text-black opacity-90">دعم متواصل</p>
-          </div>
-        </div>
+      {/* زر احسب التمويل الآن وزر إدخال تمويل وزر مراقبة التسويات */}
+      <div className="mt-8 flex justify-center gap-4">
+        <a
+          href="/cars/new"
+          className="bg-green-600 hover:bg-green-700 text-white font-bold text-lg px-8 py-3 rounded-lg shadow-md transition-colors"
+        >
+          🚗 إضافة سيارة
+        </a>
+        <a
+          href="/finance"
+          className="bg-green-600 hover:bg-green-700 text-white font-bold text-lg px-8 py-3 rounded-lg shadow-md transition-colors"
+        >
+          📈 احسب التمويل الآن
+        </a>
+        <a
+          href="/admin/car-finance-entry"
+          className="bg-green-600 hover:bg-green-700 text-white font-bold text-lg px-8 py-3 rounded-lg shadow-md transition-colors"
+        >
+          📝 ادارة نموذج الاقساط
+        </a>
+        <a
+          href="/dashboard/settlements"
+          className="bg-green-600 hover:bg-green-700 text-white font-bold text-lg px-8 py-3 rounded-lg shadow-md flex items-center gap-2 transition-colors"
+        >
+          <span>مراقبة التسويات</span>
+          <span className="text-lg">💰</span>
+        </a>
+      </div>
+
+      {/* السيارات المتاحة للشراء */}
+      <div className="mt-12">
+        <AvailableCars />
       </div>
     </div>
   );
-} 
+}
