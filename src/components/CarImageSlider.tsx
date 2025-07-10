@@ -5,25 +5,38 @@ import Image from "next/image";
 
 // جلب الصور من API السيارات
 async function fetchCarImages(): Promise<string[]> {
-  const res = await fetch("/api/cars");
-  if (!res.ok) return [];
-  const cars = await res.json();
-  // جمع كل الصور من جميع السيارات
-  const allImages: string[] = [];
-  for (const car of cars) {
-    if (Array.isArray(car.image_url)) {
-      allImages.push(...car.image_url);
+  try {
+    const res = await fetch("/api/cars");
+    if (!res.ok) {
+      console.error('Failed to fetch cars:', res.status);
+      return [];
     }
+    const cars = await res.json();
+    // جمع كل الصور من جميع السيارات
+    const allImages: string[] = [];
+    for (const car of cars) {
+      if (Array.isArray(car.image_url)) {
+        allImages.push(...car.image_url);
+      }
+    }
+    return allImages;
+  } catch (error) {
+    console.error('Error fetching car images:', error);
+    return [];
   }
-  return allImages;
 }
 
 export default function CarImageSlider() {
   const [images, setImages] = useState<string[]>([]);
   const [current, setCurrent] = useState(0);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetchCarImages().then(setImages);
+    setLoading(true);
+    fetchCarImages()
+      .then(setImages)
+      .catch(console.error)
+      .finally(() => setLoading(false));
   }, []);
 
   useEffect(() => {
@@ -33,6 +46,14 @@ export default function CarImageSlider() {
     }, 5000);
     return () => clearInterval(interval);
   }, [images]);
+
+  if (loading) {
+    return (
+      <div className="glass-card p-6 bg-gradient-to-br from-green-100 to-green-50 shadow-md flex items-center justify-center min-h-[350px]">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-500"></div>
+      </div>
+    );
+  }
 
   if (images.length === 0) {
     return (

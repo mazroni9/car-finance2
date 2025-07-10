@@ -125,6 +125,63 @@ export interface Database {
           updated_at?: string;
         };
       };
+      car_showcase: {
+        Row: {
+          id: string;
+          make: string;
+          model: string;
+          year: number;
+          price: number;
+          color: string;
+          mileage: number;
+          fuel_type: string;
+          transmission: string;
+          description: string;
+          image_url: string[];
+          technical_report_url?: string;
+          registration_image_url?: string;
+          seller_id?: string;
+          status: string;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          make: string;
+          model: string;
+          year: number;
+          price: number;
+          color: string;
+          mileage: number;
+          fuel_type: string;
+          transmission: string;
+          description: string;
+          image_url: string[];
+          technical_report_url?: string;
+          registration_image_url?: string;
+          seller_id?: string;
+          status: string;
+          id?: string;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          make?: string;
+          model?: string;
+          year?: number;
+          price?: number;
+          color?: string;
+          mileage?: number;
+          fuel_type?: string;
+          transmission?: string;
+          description?: string;
+          image_url?: string[];
+          technical_report_url?: string;
+          registration_image_url?: string;
+          seller_id?: string;
+          status?: string;
+          updated_at?: string;
+        };
+      };
       financial_entries: {
         Row: {
           id: number;
