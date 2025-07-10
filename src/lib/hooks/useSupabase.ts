@@ -17,7 +17,12 @@ export function useSupabaseQuery<T>(
           .select(query)
 
         if (queryError) throw queryError
-        setData(result || [])
+        // فحص أن result هو مصفوفة من النوع المطلوب
+        if (Array.isArray(result)) {
+          setData(result as T[])
+        } else {
+          setData([])
+        }
       } catch (err) {
         setError(err instanceof Error ? err : new Error('Unknown error'))
         console.error(`Error fetching ${table}:`, err)
