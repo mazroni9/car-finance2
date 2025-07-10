@@ -92,7 +92,10 @@ export default function SummarySection({ allMonthlyDetails, entries }: SummarySe
   // ✅ جمع سنوي
   const annualTotals: AnnualTotals = monthlyResults.reduce((acc, month) => {
     Object.keys(acc).forEach((key) => {
-      (acc as any)[key] += (month as any)[key] || 0;
+      if (key in month && key in acc) {
+        const monthValue = (month as unknown as Record<string, number>)[key] || 0;
+        (acc as Record<string, number>)[key] += monthValue;
+      }
     });
     return acc;
   }, {
