@@ -6,6 +6,17 @@ type SummarySectionProps = {
   entries: any;
 };
 
+type AnnualTotals = {
+  [key: string]: number;
+  totalOperations: number;
+  totalCapital: number;
+  transferFees: number;
+  floorFees: number;
+  subscriptions: number;
+  netProfit: number;
+  totalFinancedAmount: number;
+};
+
 export default function SummarySection({ allMonthlyDetails, entries }: SummarySectionProps) {
   const months = [
     'يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو',
@@ -63,7 +74,7 @@ export default function SummarySection({ allMonthlyDetails, entries }: SummarySe
   });
 
   // ✅ جمع سنوي
-  const annualTotals = monthlyResults.reduce((acc, month) => {
+  const annualTotals: AnnualTotals = monthlyResults.reduce((acc, month) => {
     Object.keys(acc).forEach((key) => {
       acc[key] += month[key] || 0;
     });
