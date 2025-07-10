@@ -1,3 +1,6 @@
+import { NextResponse } from 'next/server';
+import { supabase } from '@/lib/supabase/supabase';
+
 export async function GET() {
   try {
     const { data, error } = await supabase

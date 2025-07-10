@@ -1,4 +1,4 @@
-import { supabase } from './supabase';
+import { supabase } from '@/lib/supabase/supabase';
 
 /**
  * ✅ جلب محفظة بحسب معرفها
@@ -63,6 +63,36 @@ export async function getWalletByUserId(userId: string) {
   if (error) {
     console.error('❌ Error fetching wallet by user id:', error.message);
     throw new Error('فشل في جلب بيانات محفظة المستخدم');
+  }
+
+  return data;
+}
+
+/**
+ * ✅ إنشاء قيود التسوية
+ */
+export async function createSettlement(settlementData: {
+  type: string;
+  from: string;
+  to: string;
+  amount: number;
+}) {
+  const { data, error } = await supabase
+    .from('settlements')
+    .insert({
+      type: settlementData.type,
+      from_wallet_id: settlementData.from,
+      to_wallet_id: settlementData.to,
+      amount: settlementData.amount,
+      status: 'completed',
+      created_at: new Date().toISOString()
+    })
+    .select()
+    .single();
+
+  if (error) {
+    console.error('❌ Error creating settlement:', error.message);
+    throw new Error('فشل في إنشاء قيود التسوية');
   }
 
   return data;
