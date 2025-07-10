@@ -1,10 +1,10 @@
 'use client';
 
 import { useState } from 'react';
-import { createClient } from '@/lib/supabase/client';
+import { supabaseClient } from '@/lib/supabase/supabaseClient';
 
 export default function ManualRegistration() {
-  const supabase = createClient();
+  const supabase = supabaseClient();
 
   // ✅ نثبت معرف المعرض
   const showroomId = '2bf61df6-da52-45f1-88c4-05316e51df04';
