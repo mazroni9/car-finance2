@@ -14,7 +14,7 @@ type ResultsTableProps = {
   entries: Entry[];
 };
 
-export default function ResultsTable({ entries }: any) {
+export default function ResultsTable({ entries }: ResultsTableProps) {
   // ثابتات النظام
   const TRANSFER_FEE_PER_OPERATION = 117;
   const FLOOR_FEE_PER_OPERATION = 250;
@@ -46,7 +46,16 @@ export default function ResultsTable({ entries }: any) {
     };
   };
 
-  const results = entries.map(calculateRow);
+  type ResultRow = Entry & {
+    annualSubscriptions: number;
+    annualTransferFees: number;
+    annualFloorFees: number;
+    totalCapital: number;
+    coveragePerDealer: number;
+    totalCoverage: number;
+  };
+
+  const results: ResultRow[] = entries.map(calculateRow);
 
   return (
     <div className="mb-8">
@@ -66,7 +75,7 @@ export default function ResultsTable({ entries }: any) {
             </tr>
           </thead>
           <tbody>
-            {results.map((r: any, i: any) => (
+            {results.map((r: ResultRow, i: number) => (
               <tr key={i}>
                 <td className="border p-1 text-center">{r.financingRate}%</td>
                 <td className="border p-1 text-center">{Math.round(r.annualSubscriptions).toLocaleString()}</td>
