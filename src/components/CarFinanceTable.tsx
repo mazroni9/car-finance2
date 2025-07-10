@@ -2,7 +2,20 @@
 
 import React from 'react';
 
-export default function CarFinanceTable({ rows }: { rows: any[] }) {
+interface CarFinanceRow {
+  price_category: number;
+  duration_months: number;
+  quantity: number;
+  downPaymentValue: number;
+  lastPaymentValue: number;
+  salePrice: number;
+  monthlyInstallment: number;
+  totalMonthlyIncome: number;
+  profitPerCar: number;
+  totalProfit: number;
+}
+
+export default function CarFinanceTable({ rows }: { rows: CarFinanceRow[] }) {
   // ✅ المجاميع
   const totalMonthlyInstallmentsSum = rows.reduce((sum, item) => sum + (item.totalMonthlyIncome || 0), 0);
   const totalProfitSum = rows.reduce((sum, item) => sum + (item.totalProfit || 0), 0);
