@@ -15,6 +15,14 @@ export default function Page() {
 
   const [showrooms, setShowrooms] = useState<{ id: string; name: string }[]>([]);
 
+  // تحويل showrooms إلى تفاصيل Detail
+  const showroomDetails = showrooms.map((s, idx) => ({
+    id: idx + 1,
+    financingRate: 0, // أو قيمة افتراضية مناسبة
+    capital: 0,
+    operationsMonthly: 0
+  }));
+
   if (showFull) {
     return <TraderFinancePage />;
   }
@@ -27,7 +35,7 @@ export default function Page() {
         </h1>
       </div>
 
-      <BasicTable entries={entries} details={showrooms} />
+      <BasicTable entries={entries} details={showroomDetails} />
 
       <div className="flex justify-center mt-6">
         <button
