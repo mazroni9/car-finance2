@@ -2,8 +2,14 @@
 
 import { useEffect, useState } from 'react';
 
+type Wallet = {
+  id: string;
+  balance: number;
+  status: string;
+};
+
 export default function WalletSummary() {
-  const [wallet, setWallet] = useState(null);
+  const [wallet, setWallet] = useState<Wallet | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
