@@ -13,7 +13,7 @@ export default function SummarySection({ allMonthlyDetails, entries }: SummarySe
   ];
 
   // ✅ يحسب نتائج شهر واحد
-  const calculateMonthlyResults = (details, entries) => {
+  const calculateMonthlyResults = (details: any[], entries: any[]) => {
     const totalOperations = details.reduce(
       (sum, d) => sum + (Number(d.operationsMonthly) || 0), 0
     );
