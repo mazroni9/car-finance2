@@ -20,7 +20,7 @@ export async function queryTable<T extends TableName>(
   tableName: T,
   options: QueryOptions = {}
 ): Promise<Row<T>[]> {
-  let query = supabase.from(tableName).select('*')
+  let query = supabase.from(String(tableName)).select('*')
 
   if (options.filters) {
     Object.entries(options.filters).forEach(([key, value]) => {
