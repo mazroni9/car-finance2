@@ -16,6 +16,7 @@ export interface Car {
   transmission: string;
   createdAt: Date;
   updatedAt: Date;
+  description?: string;
 }
 
 /**

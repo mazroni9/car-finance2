@@ -8,8 +8,9 @@
 
 import { useState } from 'react';
 import Image from 'next/image';
+import type { Car } from '@/types/finance';
 
-export default function CarGallery({ car }: { car: any }) {
+export default function CarGallery({ car }: { car: Car }) {
   const [selected, setSelected] = useState(0);
 
   return (
@@ -21,11 +22,11 @@ export default function CarGallery({ car }: { car: any }) {
 
         <div className="grid md:grid-cols-2 gap-8">
           <div>
-            {Array.isArray(car.image_url) && car.image_url.length > 0 && car.image_url.every((url: string) => url && url.startsWith('/')) ? (
+            {Array.isArray(car.imageUrl) && car.imageUrl.length > 0 && car.imageUrl.every((url: string) => url && url.startsWith('/')) ? (
               <>
                 <div className="relative w-full h-[400px] rounded-lg overflow-hidden shadow border mb-4">
                   <Image
-                    src={car.image_url[selected]}
+                    src={car.imageUrl[selected]}
                     alt={`${car.make} ${car.model} - صورة ${selected + 1}`}
                     fill
                     className="object-cover"
@@ -33,7 +34,7 @@ export default function CarGallery({ car }: { car: any }) {
                 </div>
 
                 <div className="flex space-x-2 overflow-x-auto">
-                  {car.image_url.map((url: string, idx: number) => (
+                  {car.imageUrl.map((url: string, idx: number) => (
                     <button
                       key={idx}
                       className={`relative w-24 h-24 rounded overflow-hidden border-2 ${
@@ -68,7 +69,7 @@ export default function CarGallery({ car }: { car: any }) {
               <li>📅 الموديل: <span className="font-bold">{car.model}</span></li>
               <li>🎨 اللون: <span className="font-bold">{car.color}</span></li>
               <li>🛣️ العداد: <span className="font-bold">{car.mileage?.toLocaleString('ar-SA')} كم</span></li>
-              <li>⛽ الوقود: <span className="font-bold">{car.fuel_type}</span></li>
+              <li>⛽ الوقود: <span className="font-bold">{car.fuelType}</span></li>
               <li>⚙️ القير: <span className="font-bold">{car.transmission}</span></li>
             </ul>
 
