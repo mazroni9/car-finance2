@@ -1,10 +1,22 @@
 "use client";
 import React from 'react';
 
-export default function InputTable({ details, setDetails, financingRate }) {
-  const handleChange = (index, field, value) => {
+type Detail = {
+  id: number;
+  capital: number;
+  operationsMonthly: number;
+};
+
+type InputTableProps = {
+  details: Detail[];
+  setDetails: (newDetails: Detail[]) => void;
+  financingRate: number;
+};
+
+export default function InputTable({ details, setDetails, financingRate }: InputTableProps) {
+  const handleChange = (index: number, field: keyof Detail, value: string | number) => {
     const newDetails = [...details];
-    newDetails[index][field] = value;
+    newDetails[index][field] = typeof value === 'string' ? Number(value) : value;
     setDetails(newDetails);
   };
 
@@ -13,13 +25,13 @@ export default function InputTable({ details, setDetails, financingRate }) {
       ...details,
       {
         id: details.length + 1,
-        capital: '',
-        operationsMonthly: ''
+        capital: 0,
+        operationsMonthly: 0
       }
     ]);
   };
 
-  const removeRow = (index) => {
+  const removeRow = (index: number) => {
     setDetails(details.filter((_, i) => i !== index));
   };
 
