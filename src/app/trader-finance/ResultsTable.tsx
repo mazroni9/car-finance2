@@ -1,12 +1,25 @@
 "use client";
 import React from 'react';
 
-export default function ResultsTable({ entries }) {
+type Entry = {
+  financingRate: number;
+  monthlySubscription: number;
+  subscribers?: number;
+  dealers?: number;
+  annualOperations?: number;
+  capitalPerDealer?: number;
+};
+
+type ResultsTableProps = {
+  entries: Entry[];
+};
+
+export default function ResultsTable({ entries }: ResultsTableProps) {
   // ثابتات النظام
   const TRANSFER_FEE_PER_OPERATION = 117;
   const FLOOR_FEE_PER_OPERATION = 250;
 
-  const calculateRow = (entry) => {
+  const calculateRow = (entry: Entry) => {
     const monthlySubscription = Number(entry.monthlySubscription) || 0;
     const subscribers = Number(entry.subscribers) || 0;
     const dealers = Number(entry.dealers) || 0;
