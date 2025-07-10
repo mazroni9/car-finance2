@@ -57,10 +57,10 @@ export default function TraderFinancePage() {
   // ✅ دالة مسح الكل
   const handleClearAll = () => {
     localStorage.removeItem('monthlyDetails');
-    const empty = months.reduce((acc, month) => {
+    const empty: MonthlyDetails = months.reduce((acc, month) => {
       acc[month] = [];
       return acc;
-    }, {});
+    }, {} as MonthlyDetails);
     setMonthlyDetails(empty);
     setSaveMessage('🗑️ تم مسح كل البيانات!');
     setTimeout(() => setSaveMessage(''), 3000);
