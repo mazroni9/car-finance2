@@ -32,7 +32,7 @@ export default function InputTable({ details, setDetails, financingRate }: any) 
   };
 
   const removeRow = (index: number) => {
-    setDetails(details.filter((_: any, i: number) => i !== index));
+    setDetails(details.filter((_: Detail, i: number) => i !== index));
   };
 
   return (
