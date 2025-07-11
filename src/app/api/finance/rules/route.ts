@@ -6,10 +6,11 @@ export const revalidate = 0;
 
 export async function GET() {
   try {
-    console.log('Creating Supabase client...');
+    if (!process.env.NEXT_PUBLIC_SUPABASE_URL) {
+      console.error('Missing NEXT_PUBLIC_SUPABASE_URL');
+      return NextResponse.json({ error: 'Missing Supabase URL' }, { status: 500 });
+    }
     const supabase = createClient();
-
-    console.log('Fetching installment rules...');
     const { data: rules, error } = await supabase
       .from('installment_rules')
       .select(`
@@ -45,24 +46,19 @@ export async function GET() {
 
     if (error) {
       console.error('Database error:', error);
-      return NextResponse.json(
-        { error: 'Failed to fetch rules', details: error.message },
-        { status: 500 }
-      );
+      return NextResponse.json({ error: 'Failed to fetch rules', details: error.message }, { status: 500 });
     }
-
-    if (!rules || rules.length === 0) {
+    if (!rules || !Array.isArray(rules)) {
+      console.error('No rules returned from Supabase');
+      return NextResponse.json({ error: 'No rules returned from DB' }, { status: 500 });
+    }
+    if (rules.length === 0) {
       console.log('No rules found');
       return NextResponse.json([]);
     }
-
-    console.log(`Found ${rules.length} rules`);
     return NextResponse.json(rules);
   } catch (error) {
     console.error('Unexpected error:', error);
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Internal server error', details: error instanceof Error ? error.message : error }, { status: 500 });
   }
 } 

@@ -7,6 +7,13 @@ const supabase = createClient(supabaseUrl, supabaseKey);
 
 export async function GET() {
   try {
+    if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.SUPABASE_SERVICE_ROLE_KEY) {
+      console.error('Environment variables missing:', {
+        NEXT_PUBLIC_SUPABASE_URL: process.env.NEXT_PUBLIC_SUPABASE_URL,
+        SUPABASE_SERVICE_ROLE_KEY: process.env.SUPABASE_SERVICE_ROLE_KEY
+      });
+      return NextResponse.json({ error: 'Missing Supabase environment variables' }, { status: 500 });
+    }
     const { data, error } = await supabase
       .from('installment_rules')
       .select(`
@@ -24,7 +31,11 @@ export async function GET() {
 
     if (error) {
       console.error('Supabase error:', error);
-      return NextResponse.json({ error: 'Failed to fetch data from DB' }, { status: 500 });
+      return NextResponse.json({ error: 'Failed to fetch data from DB', details: error.message }, { status: 500 });
+    }
+    if (!data || !Array.isArray(data)) {
+      console.error('No data returned from Supabase');
+      return NextResponse.json({ error: 'No data returned from DB' }, { status: 500 });
     }
 
     const total_monthly_installments = data.reduce(
@@ -86,6 +97,6 @@ return NextResponse.json({
 
   } catch (e) {
     console.error('Server error:', e);
-    return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
+    return NextResponse.json({ error: 'Internal Server Error', details: e instanceof Error ? e.message : e }, { status: 500 });
   }
 }
