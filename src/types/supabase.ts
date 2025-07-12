@@ -114,17 +114,6 @@ export interface Database {
           updated_at?: string;
         };
       };
-      cars: {
-        Row: {
-          id: number;
-          make: string;
-          model: string;
-          year: number;
-          price: number;
-          created_at?: string;
-          updated_at?: string;
-        };
-      };
       car_showcase: {
         Row: {
           id: string;
@@ -198,7 +187,7 @@ export interface Database {
     };
     Views: {
       [key: string]: {
-        Row: Record<string, unknown>;
+        Row: Record<string, any>;
       };
     };
     Functions: {

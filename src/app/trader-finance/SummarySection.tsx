@@ -127,21 +127,26 @@ export default function SummarySection({ allMonthlyDetails, entries }: SummarySe
               <th className="text-white p-2">رأس المال</th>
               <th className="text-white p-2">المبلغ الممول</th>
               <th className="text-white p-2">صافي الربح</th>
+              <th className="text-white p-2">العائد على الاستثمار (ROI)</th>
             </tr>
           </thead>
           <tbody>
-            {monthlyResults.map((r) => (
-              <tr key={r.month}>
-                <td className="border p-1 text-center">{r.month}</td>
-                <td className="border p-1 text-center">{r.subscriptions?.toLocaleString()} ريال</td>
-                <td className="border p-1 text-center">{r.transferFees?.toLocaleString()} ريال</td>
-                <td className="border p-1 text-center">{r.floorFees?.toLocaleString()} ريال</td>
-                <td className="border p-1 text-center">{r.totalOperations}</td>
-                <td className="border p-1 text-center">{r.totalCapital?.toLocaleString()} ريال</td>
-                <td className="border p-1 text-center">{r.totalFinancedAmount?.toLocaleString()} ريال</td>
-                <td className="border p-1 text-center text-green-700 font-bold">{r.netProfit?.toLocaleString()} ريال</td>
-              </tr>
-            ))}
+            {monthlyResults.map((r) => {
+              const roi = r.totalFinancedAmount > 0 ? (r.netProfit / r.totalFinancedAmount) * 100 : 0;
+              return (
+                <tr key={r.month}>
+                  <td className="border p-1 text-center">{r.month}</td>
+                  <td className="border p-1 text-center">{r.subscriptions?.toLocaleString()} ريال</td>
+                  <td className="border p-1 text-center">{r.transferFees?.toLocaleString()} ريال</td>
+                  <td className="border p-1 text-center">{r.floorFees?.toLocaleString()} ريال</td>
+                  <td className="border p-1 text-center">{r.totalOperations}</td>
+                  <td className="border p-1 text-center">{r.totalCapital?.toLocaleString()} ريال</td>
+                  <td className="border p-1 text-center">{r.totalFinancedAmount?.toLocaleString()} ريال</td>
+                  <td className="border p-1 text-center text-green-700 font-bold">{r.netProfit?.toLocaleString()} ريال</td>
+                  <td className="border p-1 text-center text-blue-700 font-bold">{roi.toLocaleString(undefined, { maximumFractionDigits: 2 })}%</td>
+                </tr>
+              );
+            })}
           </tbody>
         </table>
       </div>
@@ -178,6 +183,10 @@ export default function SummarySection({ allMonthlyDetails, entries }: SummarySe
             <tr className="bg-green-50 font-bold text-green-800">
               <td className="border p-2">صافي الربح السنوي المقدر</td>
               <td className="border p-2">{annualTotals.netProfit?.toLocaleString()} ريال</td>
+            </tr>
+            <tr className="bg-blue-50 font-bold text-green-800">
+              <td className="border p-2">العائد السنوي على الاستثمار (ROI)</td>
+              <td className="border p-2">{annualTotals.totalFinancedAmount > 0 ? ((annualTotals.netProfit / annualTotals.totalFinancedAmount) * 100).toLocaleString(undefined, { maximumFractionDigits: 2 }) : 0}%</td>
             </tr>
           </tbody>
         </table>

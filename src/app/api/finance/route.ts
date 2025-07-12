@@ -1,8 +1,9 @@
 import { NextResponse } from 'next/server';
-import { supabase } from '@/lib/services/supabase';
+import { createClient } from '@/lib/supabase/server';
 import { checkRateLimit } from '@/lib/rate-limit';
 
 export async function GET() {
+  const supabase = createClient();
   try {
     const { data, error } = await supabase
       .from('finance_models')
@@ -22,6 +23,7 @@ export async function GET() {
 }
 
 export async function POST(request: Request) {
+  const supabase = createClient();
   try {
     // استخدام checkRateLimit بدلاً من rateLimit
     const ip = request.headers.get('x-forwarded-for') || 'unknown';

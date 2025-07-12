@@ -1,10 +1,11 @@
 import { NextResponse } from 'next/server';
-import { supabase } from '@/lib/services/supabase';
+import { createClient } from '@/lib/supabase/server';
 import { checkRateLimit } from '@/lib/rate-limit';
 import type { Settlement, SettlementFilters, SettlementSummary } from '@/types/settlement';
 
 // الحصول على جميع التسويات مع الفلاتر
 export async function GET(request: Request) {
+  const supabase = createClient();
   try {
     const clientIP = request.headers.get('x-forwarded-for') || 'unknown';
     const isAllowed = await checkRateLimit(clientIP);
@@ -84,6 +85,7 @@ export async function GET(request: Request) {
 
 // إنشاء تسوية جديدة
 export async function POST(request: Request) {
+  const supabase = createClient();
   try {
     const clientIP = request.headers.get('x-forwarded-for') || 'unknown';
     const isAllowed = await checkRateLimit(clientIP);

@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { supabase } from '@/lib/services/supabase';
+import { createClient } from '@/lib/supabase/server';
 import { checkRateLimit } from '@/lib/rate-limit';
 
 // الحصول على تفاصيل تسوية واحدة
@@ -7,6 +7,7 @@ export async function GET(
   request: Request,
   { params }: { params: { id: string } }
 ) {
+  const supabase = createClient();
   try {
     const clientIP = request.headers.get('x-forwarded-for') || 'unknown';
     const isAllowed = await checkRateLimit(clientIP);
@@ -54,6 +55,7 @@ export async function PATCH(
   request: Request,
   { params }: { params: { id: string } }
 ) {
+  const supabase = createClient();
   try {
     const clientIP = request.headers.get('x-forwarded-for') || 'unknown';
     const isAllowed = await checkRateLimit(clientIP);

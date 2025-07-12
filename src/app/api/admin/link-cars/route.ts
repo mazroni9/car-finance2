@@ -1,8 +1,9 @@
 import { NextResponse } from 'next/server';
-import { supabase } from '@/lib/supabase/client';
+import { createClient } from '@/lib/supabase/server';
 import { linkCarsToMazbrothers } from '@/lib/db/link-cars';
 
 export async function GET() {
+    const supabase = createClient();
     try {
         // 1. التحقق من السيارات قبل الربط
         const { data: beforeCars } = await supabase
