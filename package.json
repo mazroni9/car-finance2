@@ -10,7 +10,9 @@
     "dev": "next dev",
     "build": "next build --no-lint",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "clean": "rm -rf .next dist out",
+    "build:all": "npm run clean && npm run lint && npm run build"
   },
   "dependencies": {
     "@radix-ui/react-tabs": "^1.1.12",
