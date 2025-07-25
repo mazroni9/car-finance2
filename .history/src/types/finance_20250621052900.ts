@@ -1,0 +1,25 @@
+export interface CalculationResult {
+  downPayment: number;
+  lastPayment: number;
+  sellingPrice: number;
+  monthlyPayment: number;
+  totalAmount: number;
+  profitAmount: number;
+  profitRate: number;
+  months: number;
+}
+
+export interface Car {
+  id: string;
+  make: string;
+  model: string;
+  year: number;
+  price: number;
+  imageUrl?: string;
+  color: string;
+  mileage: number;
+  fuelType: string;
+  transmission: string;
+  createdAt: Date;
+  updatedAt: Date;
+} 
