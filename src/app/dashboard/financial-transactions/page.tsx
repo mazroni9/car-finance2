@@ -35,7 +35,7 @@ export default function FinancialTransactionsPage() {
 
   return (
     <div className="p-6 max-w-6xl mx-auto text-right">
-      <h1 className="text-3xl font-bold mb-6 flex items-center gap-2 text-black">
+      <h1 className="text-3xl font-bold mb-6 flex items-center gap-2 text-blue-400">
         📜 تقرير الحركات المالية
       </h1>
 

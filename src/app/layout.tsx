@@ -19,7 +19,9 @@ export default function RootLayout({
   return (
     <html lang="ar" dir="rtl">
       <body className={cairo.className} suppressHydrationWarning>
-        <Navigation />
+        <div className="print:hidden">
+          <Navigation />
+        </div>
         <main className="container mx-auto px-4 py-8">
           {children}
         </main>

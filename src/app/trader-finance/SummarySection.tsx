@@ -51,6 +51,7 @@ export default function SummarySection({ allMonthlyDetails, entries }: SummarySe
 
     const transferFees = totalOperations * 117;
     const floorFees = totalOperations * 250;
+    const platformCommission = totalOperations * 300;
 
     let subscriptions = 0;
     for (const entry of entries) {
@@ -60,7 +61,8 @@ export default function SummarySection({ allMonthlyDetails, entries }: SummarySe
       subscriptions += count * (entry.monthlySubscription || 0);
     }
 
-    const netProfit = subscriptions + transferFees + floorFees;
+    // صافي الربح السنوي الجديد: اشتراكات + رسوم نقل الملكية + رسوم الأرضيات + عمولة المنصة
+    const netProfit = subscriptions + transferFees + floorFees + platformCommission;
 
     // ✅ حساب المبلغ الممول فعليًا
     const totalFinancedAmount = details.reduce(
@@ -74,6 +76,7 @@ export default function SummarySection({ allMonthlyDetails, entries }: SummarySe
       totalCapital,
       transferFees,
       floorFees,
+      platformCommission,
       subscriptions,
       netProfit,
       totalFinancedAmount
@@ -105,24 +108,26 @@ export default function SummarySection({ allMonthlyDetails, entries }: SummarySe
     floorFees: 0,
     subscriptions: 0,
     netProfit: 0,
-    totalFinancedAmount: 0
+    totalFinancedAmount: 0,
+    platformCommission: 0 // أضفت هذا السطر لجمع عمولة المنصة السنوية
   });
 
   return (
     <div className="mb-16">
 
       {/* ✅ النتائج الشهرية التفصيلية */}
-      <h3 className="text-lg font-bold mb-2 text-green-600 flex items-center">
+      <h3 className="text-lg font-bold mb-2 text-green-600 flex items-center text-center">
         🗓️ النتائج الشهرية التفصيلية
       </h3>
-      <div className="overflow-x-auto mb-8">
-        <table className="table-auto w-full border">
+      <div className="overflow-x-auto mb-8 flex justify-center">
+        <table className="table-auto border max-w-5xl w-full">
           <thead>
             <tr className="bg-green-800">
               <th className="text-white p-2">الشهر</th>
               <th className="text-white p-2">الاشتراكات</th>
               <th className="text-white p-2">رسوم نقل الملكية</th>
               <th className="text-white p-2">رسوم الأرضيات</th>
+              <th className="text-white p-2">عمولة المنصة (ريال)</th>
               <th className="text-white p-2">عدد العمليات</th>
               <th className="text-white p-2">رأس المال</th>
               <th className="text-white p-2">المبلغ الممول</th>
@@ -139,6 +144,7 @@ export default function SummarySection({ allMonthlyDetails, entries }: SummarySe
                   <td className="border p-1 text-center">{r.subscriptions?.toLocaleString()} ريال</td>
                   <td className="border p-1 text-center">{r.transferFees?.toLocaleString()} ريال</td>
                   <td className="border p-1 text-center">{r.floorFees?.toLocaleString()} ريال</td>
+                  <td className="border p-1 text-center text-green-700 font-bold">{(r.totalOperations * 300).toLocaleString()} ريال</td>
                   <td className="border p-1 text-center">{r.totalOperations}</td>
                   <td className="border p-1 text-center">{r.totalCapital?.toLocaleString()} ريال</td>
                   <td className="border p-1 text-center">{r.totalFinancedAmount?.toLocaleString()} ريال</td>
@@ -152,9 +158,11 @@ export default function SummarySection({ allMonthlyDetails, entries }: SummarySe
       </div>
 
       {/* ✅ النتائج السنوية المجمعة */}
-      <h3 className="text-lg font-bold mb-2 text-green-600">📈 النتائج السنوية المجمعة</h3>
-      <div className="overflow-x-auto">
-        <table className="table-auto w-full border">
+      <h3 className="text-lg font-bold mb-2 text-green-600 print:break-before-page text-center" style={{breakBefore: 'page'}}>
+        📈 النتائج السنوية المجمعة
+      </h3>
+      <div className="overflow-x-auto flex justify-center">
+        <table className="table-auto border max-w-5xl w-full">
           <tbody>
             <tr>
               <td className="border p-2">إجمالي الاشتراكات السنوية</td>
@@ -167,6 +175,10 @@ export default function SummarySection({ allMonthlyDetails, entries }: SummarySe
             <tr>
               <td className="border p-2">رسوم الأرضيات الإجمالية</td>
               <td className="border p-2">{annualTotals.floorFees?.toLocaleString()} ريال</td>
+            </tr>
+            <tr>
+              <td className="border p-2">مجموع عمولة المنصة السنوي</td>
+              <td className="border p-2">{annualTotals.platformCommission?.toLocaleString()} ريال</td>
             </tr>
             <tr>
               <td className="border p-2">عدد العمليات الإجمالية</td>

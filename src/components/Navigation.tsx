@@ -2,9 +2,34 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { useState, useEffect } from 'react';
 
 export default function Navigation() {
-  const pathname = usePathname();
+  const [pathname, setPathname] = useState<string>('');
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+    // استخدام window.location.pathname بدلاً من usePathname لتجنب مشاكل Hydration
+    setPathname(window.location.pathname);
+    
+    // إضافة listener لتحديث pathname عند تغيير الصفحة
+    const handleRouteChange = () => {
+      setPathname(window.location.pathname);
+    };
+
+    // استمع لتغييرات التاريخ
+    window.addEventListener('popstate', handleRouteChange);
+    
+    return () => {
+      window.removeEventListener('popstate', handleRouteChange);
+    };
+  }, []);
+
+  // لا نرسم أي شيء حتى يتم التحميل
+  if (!mounted) {
+    return null;
+  }
 
   return (
     <header className="w-full bg-[#121212]">
@@ -33,7 +58,13 @@ export default function Navigation() {
                   href="/car-finance"
                   className={`nav-link ${pathname === '/car-finance' ? 'bg-white/10' : ''}`}
                 >
-                  نظام التأجير
+                  نظام التأجير التمويلي
+                </Link>
+                <Link 
+                  href="/car-leasing"
+                  className={`nav-link ${pathname === '/car-leasing' ? 'bg-white/10' : ''}`}
+                >
+                  📝 نظام التأجير المطور
                 </Link>
                 <Link 
                   href="/reports" 

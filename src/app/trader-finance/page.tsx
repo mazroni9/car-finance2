@@ -23,9 +23,9 @@ export default function Page() {
 
   const [entries] = useState([
     { financingRate: 25, monthlySubscription: 500 },
-    { financingRate: 50, monthlySubscription: 1000 },
-    { financingRate: 75, monthlySubscription: 1500 },
-    { financingRate: 100, monthlySubscription: 2000 }
+    { financingRate: 50, monthlySubscription: 800 },
+    { financingRate: 75, monthlySubscription: 1200 },
+    { financingRate: 100, monthlySubscription: 1500 }
   ]);
 
   const initialMonthlyDetails: MonthlyDetails = months.reduce((acc, month) => {
@@ -45,7 +45,7 @@ export default function Page() {
 
   // حفظ تلقائي عند كل تعديل
   useEffect(() => {
-    if (typeof window !== 'undefined') {
+    if (typeof window !== 'undefined' && monthlyDetails) {
       localStorage.setItem('monthlyDetails', JSON.stringify(monthlyDetails));
     }
   }, [monthlyDetails]);
@@ -59,41 +59,54 @@ export default function Page() {
 
   return (
     <main className="max-w-6xl mx-auto p-6">
-      <div className="text-center py-4">
+      <div className="text-center py-4 flex items-center justify-between print:block print:w-full print:justify-center">
         <h1 className="text-3xl font-bold text-blue-700">
           أهلا بكم في نظام تمويل التجار لدى معارض السيارات
         </h1>
+        <button
+          onClick={() => window.print()}
+          className="ml-4 bg-green-700 hover:bg-green-800 text-white px-4 py-2 rounded shadow text-lg print:hidden"
+        >
+          🖨️ طباعة النتائج PDF
+        </button>
       </div>
 
-      {/* أزرار اختيار الشهر */}
-      <div className="flex flex-wrap justify-center gap-2 mb-4">
-        {months.map((month) => (
-          <button
-            key={month}
-            onClick={() => setSelectedMonth(month)}
-            className={`px-3 py-1 rounded border ${
-              selectedMonth === month
-                ? 'bg-blue-700 text-white'
-                : 'bg-white text-blue-700 border-blue-700'
-            }`}
-          >
-            {month}
-          </button>
-        ))}
-      </div>
+      <div className="print:hidden">
+        <div className="flex flex-wrap justify-center gap-2 mb-4">
+          {months.map((month) => (
+            <button
+              key={month}
+              onClick={() => setSelectedMonth(month)}
+              className={`px-3 py-1 rounded border ${
+                selectedMonth === month
+                  ? 'bg-blue-700 text-white'
+                  : 'bg-white text-blue-700 border-blue-700'
+              }`}
+            >
+              {month}
+            </button>
+          ))}
+        </div>
 
-      {/* جدول التمويل للشهر المختار */}
-      <BasicTable entries={entries} details={monthlyDetails[selectedMonth]} />
+        {/* جدول التمويل للشهر المختار */}
+        <BasicTable entries={entries} details={monthlyDetails[selectedMonth]} />
+
+        <div className="text-center text-green-600 font-bold mt-2">
+          ✅ يتم الحفظ تلقائيًا عند أي تعديل
+        </div>
+      </div>
 
       {/* جدول النتائج السنوية + الشهرية */}
       <SummarySection allMonthlyDetails={monthlyDetails} entries={entries} />
 
       {/* جدول تفاصيل المشتركين لهذا الشهر فقط */}
-      <DetailsTable
-        details={monthlyDetails[selectedMonth]}
-        setDetails={(newData) => updateMonthDetails(selectedMonth, newData)}
-        financingRates={entries.map((e) => e.financingRate)}
-      />
+      <div className="mt-8 print:hidden">
+        <DetailsTable
+          details={monthlyDetails[selectedMonth]}
+          setDetails={(newData) => updateMonthDetails(selectedMonth, newData)}
+          financingRates={entries.map((e) => e.financingRate)}
+        />
+      </div>
     </main>
   );
-}
+} 

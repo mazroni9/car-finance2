@@ -14,6 +14,7 @@ import type { Settlement } from '@/types/settlement';
 import jsPDF from 'jspdf';
 import 'jspdf-autotable';
 
+
 interface DealerWallet {
   id: string;
   user_id: string;

@@ -56,6 +56,7 @@ export interface InstallmentRule {
   guaranteeContractCost: number;
   inspectionCost: number;
   profitPerCar: number;
+  baseProfit: number;
   totalMonthlyProfit: number;
   totalProfitFullPeriod: number;
   roiFullPeriod: number;

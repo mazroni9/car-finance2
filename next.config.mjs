@@ -15,6 +15,11 @@ const nextConfig = {
         hostname: 'res.cloudinary.com',
         pathname: '**',
       },
+      // السماح بتحميل الصور من example.com (للبيانات التجريبية)
+      {
+        protocol: 'https',
+        hostname: 'example.com',
+      },
     ],
   },
 };

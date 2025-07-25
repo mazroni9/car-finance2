@@ -1,4 +1,18 @@
+'use client';
+import LeasingMonthlySummaryCard from './LeasingMonthlySummaryCard';
+import AnnualSummaryTable from '../car-leasing/AnnualSummaryTable';
+import React, { useEffect, useState } from 'react';
+
 export default function ReportsPage() {
+  const [rows, setRows] = useState<any[]>([]);
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const savedRows = localStorage.getItem('carLeasingRows');
+      if (savedRows) {
+        setRows(JSON.parse(savedRows));
+      }
+    }
+  }, []);
   return (
     <div className="space-y-6">
       <div className="glass-card p-6 bg-gradient-to-br from-blue-100 to-blue-50 shadow-md">
@@ -9,6 +23,10 @@ export default function ReportsPage() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {/* بطاقة ملخص الإيجار الشهري */}
+        <LeasingMonthlySummaryCard />
+        {/* بطاقة الملخص السنوي */}
+        <AnnualSummaryTable rows={rows} />
         {/* تقرير المبيعات */}
         <div className="glass-card p-6 bg-gradient-to-br from-green-100 to-green-50 shadow-md hover:shadow-lg transition-shadow">
           <h2 className="text-2xl font-bold mb-6 text-black">تقرير المبيعات</h2>

@@ -53,9 +53,6 @@ export default function BasicTable({ entries, details }: BasicTableProps) {
           </tbody>
         </table>
       </div>
-      <div className="text-center text-green-600 font-bold mt-2">
-        ✅ يتم الحفظ تلقائيًا عند أي تعديل
-      </div>
     </div>
   );
 }

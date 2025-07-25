@@ -69,6 +69,7 @@ export default function ResultsTable({ entries }: ResultsTableProps) {
               <th className="text-white p-2">اشتراكات سنوية (ريال)</th>
               <th className="text-white p-2">رسوم نقل الملكية (ريال)</th>
               <th className="text-white p-2">رسوم الأرضية (ريال)</th>
+              <th className="text-white p-2">عمولة المنصة (ريال)</th>
               <th className="text-white p-2">رأس المال الإجمالي (ريال)</th>
               <th className="text-white p-2">قيمة التغطية للتاجر (ريال)</th>
               <th className="text-white p-2">إجمالي التغطية (ريال)</th>
@@ -81,6 +82,7 @@ export default function ResultsTable({ entries }: ResultsTableProps) {
                 <td className="border p-1 text-center">{Math.round(r.annualSubscriptions).toLocaleString()}</td>
                 <td className="border p-1 text-center">{Math.round(r.annualTransferFees).toLocaleString()}</td>
                 <td className="border p-1 text-center">{Math.round(r.annualFloorFees).toLocaleString()}</td>
+                <td className="border p-1 text-center text-green-700 font-bold">0</td>
                 <td className="border p-1 text-center">{Math.round(r.totalCapital).toLocaleString()}</td>
                 <td className="border p-1 text-center">{Math.round(r.coveragePerDealer).toLocaleString()}</td>
                 <td className="border p-1 text-center">{Math.round(r.totalCoverage).toLocaleString()}</td>
