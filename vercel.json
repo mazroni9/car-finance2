@@ -21,6 +21,5 @@
     "src/app/api/**/*.ts": {
       "maxDuration": 30
     }
-  },
-  "packageManager": "npm"
+  }
 } 
