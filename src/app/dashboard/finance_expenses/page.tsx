@@ -7,8 +7,8 @@
 
 'use client';
 
-import { supabase } from '../../../../lib/services/supabase'
-import { BackButton } from '../../../../components/ui/back-button'
+import { supabase } from '@/lib/services/supabase'
+import { BackButton } from '@/components/ui/back-button'
 
 export default async function FinanceExpensesPage() {
   const { data: expenses, error } = await supabase

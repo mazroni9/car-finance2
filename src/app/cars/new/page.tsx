@@ -15,7 +15,7 @@
 
 'use client';
 
-import CarEntryForm from '../../../../components/CarEntryForm';
+import CarEntryForm from '@/components/CarEntryForm';
 import Link from 'next/link';
 
 export default function NewCarPage() {

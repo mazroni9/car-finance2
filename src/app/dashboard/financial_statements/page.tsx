@@ -1,4 +1,4 @@
-import { supabase } from '../../../../lib/services/supabase'
+import { supabase } from '@/lib/services/supabase'
 
 export default async function FinancialStatementsPage() {
   const { data, error } = await supabase

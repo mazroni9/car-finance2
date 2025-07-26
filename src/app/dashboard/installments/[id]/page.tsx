@@ -22,8 +22,8 @@
 
 import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
-import { supabase } from '../../../../lib/services/supabase';
-import { BackButton } from '../../../../components/ui/back-button';
+import { supabase } from '@/lib/services/supabase';
+import { BackButton } from '@/components/ui/back-button';
 
 interface Installment {
   id: string;

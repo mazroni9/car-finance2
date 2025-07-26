@@ -27,7 +27,7 @@
 'use client';
 
 import { useState } from 'react';
-import { BackButton } from '../../../../components/ui/back-button';
+import { BackButton } from '@/components/ui/back-button';
 
 export default function FinanceReportsPage() {
   const [selectedPeriod] = useState('monthly');

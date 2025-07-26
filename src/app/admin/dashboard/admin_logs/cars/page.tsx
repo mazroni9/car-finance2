@@ -8,8 +8,8 @@
 'use client'
 
 import React, { useEffect, useState } from 'react'
-import supabase from '../../../../lib/services/supabase'
-import type { Database } from '../../../../types/supabase'
+import supabase from '@/lib/services/supabase'
+import type { Database } from '@/types/supabase'
 
 type Car = Database['public']['Tables']['cars']['Row']
 

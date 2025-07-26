@@ -1,11 +1,11 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import SettlementSummary from '../../../../components/settlements/SettlementSummary';
-import SettlementTable from '../../../../components/settlements/SettlementTable';
-import SettlementFilters from '../../../../components/settlements/SettlementFilters';
-import SettlementDetails from '../../../../components/settlements/SettlementDetails';
-import type { Settlement, SettlementFilters as SettlementFiltersType } from '../../../../types/settlement';
+import SettlementSummary from '@/components/settlements/SettlementSummary';
+import SettlementTable from '@/components/settlements/SettlementTable';
+import SettlementFilters from '@/components/settlements/SettlementFilters';
+import SettlementDetails from '@/components/settlements/SettlementDetails';
+import type { Settlement, SettlementFilters as SettlementFiltersType } from '@/types/settlement';
 
 export default function SettlementsPage() {
   const [settlements, setSettlements] = useState<Settlement[]>([]);

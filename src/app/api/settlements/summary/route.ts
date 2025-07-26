@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { checkRateLimit } from '@/lib/rate-limit';
-import type { SettlementSummary } from '../../../../types/settlement';
+import type { SettlementSummary } from '@/types/settlement';
 
 export async function GET(request: Request) {
   const supabase = createClient();
