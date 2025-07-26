@@ -1,1 +1,0 @@
-export const PLATFORM_WALLET_ID = '16dcb112-1222-4e51-9869-6ec0624eea8e'; 

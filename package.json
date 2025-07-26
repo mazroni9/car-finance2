@@ -24,7 +24,6 @@
     "@radix-ui/react-toast": "^1.2.14",
     "@supabase/ssr": "^0.6.1",
     "@supabase/supabase-js": "^2.50.3",
-    "@tailwindcss/nesting": "^0.0.0-insiders.565cd3e",
     "@tanstack/react-query": "^5.83.0",
     "@types/html2canvas": "^0.5.35",
     "@types/moment": "^2.13.0",
