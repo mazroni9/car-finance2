@@ -1,9 +1,9 @@
 "use client";
 // Force redeploy - Added footer and about section - Updated at 26/7/2025
 import Link from 'next/link';
-import CarEntryForm from '@/components/CarEntryForm';
-import CarImageSlider from '@/components/CarImageSlider';
-import AvailableCars from '@/components/AvailableCars';
+import CarEntryForm from '../../../../components/CarEntryForm';
+import CarImageSlider from '../../../../components/CarImageSlider';
+import AvailableCars from '../../../../components/AvailableCars';
 import FinanceCalculator from '@/app/finance/page';
 
 export default function HomePage() {

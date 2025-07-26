@@ -16,8 +16,8 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { supabase } from '@/lib/services/supabase';
-import type { Database } from '@/types/supabase';
+import { supabase } from '../../../../lib/services/supabase';
+import type { Database } from '../../../../types/supabase';
 
 type Transaction = Database['public']['Tables']['transactions']['Row'];
 

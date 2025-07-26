@@ -6,7 +6,7 @@ import {
   incrementWalletBalance,
   createSettlement
 } from '@/lib/services/walletService';
-import type { Wallet, PurchaseCarRequest } from '@/types/finance';
+import type { Wallet, PurchaseCarRequest } from '../../../../types/finance';
 
 // ✅ معرف محفظة المنصة الثابت
 const platformWalletId = '16dcb112-1222-4e51-9869-6ec0624eea8e';

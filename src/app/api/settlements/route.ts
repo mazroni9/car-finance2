@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { checkRateLimit } from '@/lib/rate-limit';
-import type { Settlement, SettlementFilters, SettlementSummary } from '@/types/settlement';
+import type { Settlement, SettlementFilters, SettlementSummary } from '../../../../types/settlement';
 
 // الحصول على جميع التسويات مع الفلاتر
 export async function GET(request: Request) {

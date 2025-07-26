@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import InstallmentRulesTable from "@/components/InstallmentRulesTable";
+import InstallmentRulesTable from '../../../../components/InstallmentRulesTable';
 
 export default function Page() {
   return (

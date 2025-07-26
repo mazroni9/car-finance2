@@ -1,5 +1,5 @@
 import { Cairo } from "next/font/google";
-import Navigation from "@/components/Navigation";
+import Navigation from '../../../../components/Navigation';
 import "./globals.css";
 import { metadata } from "./metadata";
 

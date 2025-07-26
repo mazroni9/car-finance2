@@ -9,7 +9,7 @@
 
 import React from 'react'
 import { useSupabaseQuery } from '@/lib/hooks/useSupabase'
-import type { Database } from '@/types/supabase'
+import type { Database } from '../../../../types/supabase'
 
 type CreditLimit = Database['public']['Tables']['credit_limits']['Row']
 

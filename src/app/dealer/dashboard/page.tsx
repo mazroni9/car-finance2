@@ -2,15 +2,15 @@
 
 import { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase/supabase';
-import WalletSummary from '@/components/WalletSummary';
-import DealerSalesHistory from '@/components/DealerSalesHistory';
-import MyCarsList from '@/components/MyCarsList';
-import AvailableCars from '@/components/AvailableCars';
+import WalletSummary from '../../../../components/WalletSummary';
+import DealerSalesHistory from '../../../../components/DealerSalesHistory';
+import MyCarsList from '../../../../components/MyCarsList';
+import AvailableCars from '../../../../components/AvailableCars';
 import Image from 'next/image';
 import type { User } from '@supabase/supabase-js';
 import { SupabaseClient } from '@supabase/supabase-js';
 import React, { useRef } from 'react';
-import type { Settlement } from '@/types/settlement';
+import type { Settlement } from '../../../../types/settlement';
 import jsPDF from 'jspdf';
 import 'jspdf-autotable';
 

@@ -8,7 +8,7 @@
 
 import { useState } from 'react';
 import Image from 'next/image';
-import type { Car } from '@/types/finance';
+import type { Car } from '../../../../types/finance';
 
 export default function CarGallery({ car }: { car: Car }) {
   const [selected, setSelected] = useState(0);

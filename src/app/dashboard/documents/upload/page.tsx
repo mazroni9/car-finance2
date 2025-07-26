@@ -8,9 +8,9 @@
 'use client'
 
 import React, { useState } from 'react'
-import { supabase } from '@/lib/services/supabase'
+import { supabase } from '../../../../lib/services/supabase'
 import { useRouter } from 'next/navigation'
-import { BackButton } from '@/components/ui/back-button'
+import { BackButton } from '../../../../components/ui/back-button'
 
 export default function UploadDocumentPage() {
   const [file, setFile] = useState<File | null>(null)

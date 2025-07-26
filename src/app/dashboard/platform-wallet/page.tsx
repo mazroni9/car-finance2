@@ -1,6 +1,6 @@
 'use client';
 
-import PlatformWalletSummary from '@/components/PlatformWalletSummary';
+import PlatformWalletSummary from '../../../../components/PlatformWalletSummary';
 
 export default function PlatformWalletPage() {
   return (
