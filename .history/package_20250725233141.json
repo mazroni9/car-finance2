@@ -1,7 +1,6 @@
 {
-  "name": "car-finance-3",
-  "version": "1.0.0",
-  "description": "نظام تمويل السيارات المتكامل - Car Finance System",
+  "name": "car-finance-dashboard",
+  "version": "0.1.0",
   "private": true,
   "engines": {
     "node": ">=18.0.0",
@@ -27,7 +26,7 @@
     "jspdf": "^3.0.1",
     "jspdf-autotable": "^5.0.2",
     "lru-cache": "^11.1.0",
-    "next": "^14.2.30",
+    "next": "14.1.0",
     "papaparse": "^5.5.3",
     "picocolors": "^1.0.0",
     "postcss": "^8.4.35",
@@ -62,20 +61,8 @@
     "typescript": "5.3.3",
     "utf-8-validate": "^6.0.5"
   },
-  "keywords": [
-    "car-finance",
-    "nextjs",
-    "react",
-    "typescript",
-    "supabase",
-    "arabic",
-    "finance-system"
-  ],
-  "author": "Car Finance Team",
-  "license": "MIT",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/mazroni9/car-finance-3.git"
-  },
-  "homepage": "https://github.com/mazroni9/car-finance-3#readme"
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": ""
 }
