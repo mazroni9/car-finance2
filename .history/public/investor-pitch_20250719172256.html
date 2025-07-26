@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DASM-e - عرض المستثمر</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Cairo', Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f8f9fa;
+            direction: rtl;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: white;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+        }
+        
+        .header {
+            text-align: center;
+            padding: 40px 0;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            margin-bottom: 30px;
+        }
+        
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+        
+        .header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+        
+        .export-buttons {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 1000;
+            display: flex;
+            gap: 10px;
+            flex-direction: column;
+        }
+        
+        .export-btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-family: 'Cairo', Arial, sans-serif;
+            font-weight: 600;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+        }
+        
+        .print-btn {
+            background: #28a745;
+            color: white;
+        }
+        
+        .pdf-btn {
+            background: #dc3545;
+            color: white;
+        }
+        
+        .word-btn {
+            background: #007bff;
+            color: white;
+        }
+        
+        .export-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        }
+        
+        .section {
+            margin-bottom: 40px;
+            padding: 30px;
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .section h2 {
+            color: #2c3e50;
+            font-size: 1.8rem;
+            margin-bottom: 20px;
+            border-bottom: 3px solid #667eea;
+            padding-bottom: 10px;
+        }
+        
+        .section h3 {
+            color: #34495e;
+            font-size: 1.4rem;
+            margin: 25px 0 15px 0;
+        }
+        
+        .highlight-box {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 25px;
+            border-radius: 12px;
+            margin: 20px 0;
+        }
+        
+        .highlight-box h3 {
+            color: white;
+            margin-bottom: 15px;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+        
+        .stat-card {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+            text-align: center;
+        }
+        
+        .stat-number {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+        
+        .stat-label {
+            font-size: 1rem;
+            color: #666;
+        }
+        
+        .timeline {
+            position: relative;
+            padding-right: 30px;
+        }
+        
+        .timeline::before {
+            content: '';
+            position: absolute;
+            right: 15px;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: #667eea;
+        }
+        
+        .timeline-item {
+            position: relative;
+            margin-bottom: 30px;
+            padding-right: 40px;
+        }
+        
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            right: -8px;
+            top: 0;
+            width: 16px;
+            height: 16px;
+            background: #667eea;
+            border-radius: 50%;
+        }
+        
+        .timeline-date {
+            font-weight: 600;
+            color: #667eea;
+            margin-bottom: 5px;
+        }
+        
+        .contact-info {
+            background: #e8f4fd;
+            padding: 25px;
+            border-radius: 12px;
+            border: 2px solid #007bff;
+            margin-top: 30px;
+        }
+        
+        .contact-info h3 {
+            color: #007bff;
+            margin-bottom: 15px;
+        }
+        
+        .contact-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        
+        .contact-icon {
+            margin-left: 10px;
+            font-size: 1.2rem;
+            color: #007bff;
+        }
+        
+        @media print {
+            .export-buttons {
+                display: none;
+            }
+            
+            body {
+                background: white;
+            }
+            
+            .container {
+                box-shadow: none;
+                padding: 0;
+            }
+            
+            .section {
+                box-shadow: none;
+                border: 1px solid #ddd;
+                margin-bottom: 20px;
+                page-break-inside: avoid;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .export-buttons {
+                position: static;
+                margin-bottom: 20px;
+                flex-direction: row;
+                justify-content: center;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="export-buttons">
+        <button class="export-btn print-btn" onclick="window.print()">🖨️ طباعة</button>
+        <button class="export-btn pdf-btn" onclick="exportToPDF()">📄 تصدير PDF</button>
+        <button class="export-btn word-btn" onclick="exportToWord()">📝 تصدير Word</button>
+    </div>
+
+    <div class="container">
+        <div class="header">
+            <h1>DASM-e</h1>
+            <p>Digital Auction Specialists Markets & e-Commerce</p>
+            <p>"Your car, your rules, your way"</p>
+        </div>
+
+        <div class="section">
+            <h2>نبذة عن الشركة</h2>
+            <p>DASM-e هي شركة رائدة في مجال المزادات الرقمية والتجارة الإلكترونية، متخصصة في بيع وشراء السيارات المستعملة. تأسست الشركة بهدف توفير منصة آمنة وشفافة للمعاملات التجارية في مجال السيارات.</p>
+            
+            <div class="highlight-box">
+                <h3>رؤيتنا</h3>
+                <p>أن نكون المنصة الرائدة في الشرق الأوسط للمزادات الرقمية والتجارة الإلكترونية في مجال السيارات، مع توفير تجربة استثنائية للمشترين والبائعين.</p>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>الخدمات المقدمة</h2>
+            
+            <h3>المزادات الرقمية</h3>
+            <p>منصة مزادات رقمية متطورة تتيح للمستخدمين المشاركة في المزادات من أي مكان في العالم، مع ضمان الشفافية والأمان في جميع المعاملات.</p>
+            
+            <h3>التجارة الإلكترونية</h3>
+            <p>متجر إلكتروني متكامل لبيع وشراء السيارات المستعملة، مع خدمات التقييم والتمويل والتأمين.</p>
+            
+            <h3>خدمات التمويل</h3>
+            <p>حلول تمويلية مرنة لشراء السيارات، تشمل التمويل الشخصي والتمويل التجاري مع أسعار تنافسية.</p>
+            
+            <h3>خدمات ما بعد البيع</h3>
+            <p>خدمات شاملة تشمل الصيانة والتأمين والتسجيل والنقل، لضمان تجربة مكتملة للعملاء.</p>
+        </div>
+
+        <div class="section">
+            <h2>المزايا التنافسية</h2>
+            
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-number">24/7</div>
+                    <div class="stat-label">خدمة متواصلة</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">100%</div>
+                    <div class="stat-label">شفافية في المعاملات</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">50+</div>
+                    <div class="stat-label">شريك تجاري</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">1000+</div>
+                    <div class="stat-label">سيارة مباعة</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>الفرص الاستثمارية</h2>
+            
+            <h3>سوق متنامي</h3>
+            <p>السوق السعودي للسيارات المستعملة ينمو بمعدل سنوي مركب يبلغ 8.5%، مع توقعات بوصول حجم السوق إلى 15 مليار ريال بحلول 2025.</p>
+            
+            <h3>تحول رقمي</h3>
+            <p>التحول السريع نحو التجارة الإلكترونية في المملكة، مع ارتفاع معدل استخدام الإنترنت إلى 95% من السكان.</p>
+            
+            <h3>دعم حكومي</p>
+            <p>رؤية 2030 تدعم التحول الرقمي وريادة الأعمال، مع توفير بيئة استثمارية جذابة للشركات التقنية.</p>
+        </div>
+
+        <div class="section">
+            <h2>الخطة الاستراتيجية</h2>
+            
+            <div class="timeline">
+                <div class="timeline-item">
+                    <div class="timeline-date">المرحلة الأولى (2024)</div>
+                    <h3>إطلاق المنصة الأساسية</h3>
+                    <p>تطوير وإطلاق منصة المزادات الرقمية الأساسية مع خدمات التمويل الأولية.</p>
+                </div>
+                
+                <div class="timeline-item">
+                    <div class="timeline-date">المرحلة الثانية (2025)</div>
+                    <h3>التوسع في الخدمات</h3>
+                    <p>إضافة خدمات التأمين والصيانة والتسجيل، مع التوسع في المناطق الجغرافية.</p>
+                </div>
+                
+                <div class="timeline-item">
+                    <div class="timeline-date">المرحلة الثالثة (2026)</div>
+                    <h3>الانتشار الإقليمي</h3>
+                    <p>التوسع في دول مجلس التعاون الخليجي مع إطلاق خدمات متقدمة مثل الذكاء الاصطناعي.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>المؤشرات المالية</h2>
+            
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-number">5M ريال</div>
+                    <div class="stat-label">إيرادات متوقعة 2024</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">15M ريال</div>
+                    <div class="stat-label">إيرادات متوقعة 2025</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">30M ريال</div>
+                    <div class="stat-label">إيرادات متوقعة 2026</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">25%</div>
+                    <div class="stat-label">معدل النمو السنوي</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>متطلبات الاستثمار</h2>
+            
+            <h3>رأس المال المطلوب</h3>
+            <p>نحتاج إلى استثمار بقيمة 2 مليون ريال لتطوير المنصة والتوسع في السوق.</p>
+            
+            <h3>استخدام الأموال</h3>
+            <ul>
+                <li>تطوير المنصة التقنية: 40%</li>
+                <li>التسويق والدعاية: 30%</li>
+                <li>التشغيل والتوظيف: 20%</li>
+                <li>رأس المال العامل: 10%</li>
+            </ul>
+            
+            <h3>العائد المتوقع</h3>
+            <p>نستهدف عائد استثماري يبلغ 35% سنوياً، مع إمكانية الخروج خلال 3-5 سنوات.</p>
+        </div>
+
+        <div class="section">
+            <h2>فريق العمل</h2>
+            
+            <h3>الخبرات المتنوعة</h3>
+            <p>فريق متخصص من الخبراء في مجال التكنولوجيا والتجارة الإلكترونية والتمويل، مع خبرة تزيد عن 15 عاماً في السوق السعودي.</p>
+            
+            <h3>الشراكات الاستراتيجية</h3>
+            <p>شراكات مع كبرى البنوك وشركات التأمين وشركات النقل، لضمان تقديم خدمات متكاملة للعملاء.</p>
+        </div>
+
+        <div class="contact-info">
+            <h3>معلومات التواصل</h3>
+            <div class="contact-item">
+                <span class="contact-icon">📧</span>
+                <span>البريد الإلكتروني: info@dasm-e.com</span>
+            </div>
+            <div class="contact-item">
+                <span class="contact-icon">📱</span>
+                <span>الهاتف: +966 50 123 4567</span>
+            </div>
+            <div class="contact-item">
+                <span class="contact-icon">🌐</span>
+                <span>الموقع الإلكتروني: www.dasm-e.com</span>
+            </div>
+            <div class="contact-item">
+                <span class="contact-icon">📍</span>
+                <span>العنوان: الرياض، المملكة العربية السعودية</span>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <script>
+        function exportToPDF() {
+            const element = document.querySelector('.container');
+            const opt = {
+                margin: [10, 10, 10, 10],
+                filename: 'DASM-e-عرض-المستثمر.pdf',
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { 
+                    scale: 2,
+                    useCORS: true,
+                    letterRendering: true
+                },
+                jsPDF: { 
+                    unit: 'mm', 
+                    format: 'a4', 
+                    orientation: 'portrait' 
+                }
+            };
+            
+            // إزالة أزرار التصدير قبل التصدير
+            const exportButtons = document.querySelector('.export-buttons');
+            exportButtons.style.display = 'none';
+            
+            html2pdf().set(opt).from(element).save().then(() => {
+                exportButtons.style.display = 'flex';
+            });
+        }
+        
+        function exportToWord() {
+            const content = document.querySelector('.container').innerHTML;
+            const htmlContent = `
+                <!DOCTYPE html>
+                <html lang="ar" dir="rtl">
+                <head>
+                    <meta charset="UTF-8">
+                    <title>DASM-e - عرض المستثمر</title>
+                    <style>
+                        @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700&display=swap');
+                        body { font-family: 'Cairo', Arial, sans-serif; direction: rtl; line-height: 1.6; }
+                        .header { text-align: center; background: #667eea; color: white; padding: 20px; }
+                        .section { margin: 20px 0; padding: 15px; border: 1px solid #ddd; }
+                        .highlight-box { background: #667eea; color: white; padding: 15px; margin: 10px 0; }
+                        .stats-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+                        .stat-card { background: #f8f9fa; padding: 10px; text-align: center; }
+                        .contact-info { background: #e8f4fd; padding: 15px; border: 2px solid #007bff; }
+                    </style>
+                </head>
+                <body>
+                    ${content}
+                </body>
+                </html>
+            `;
+            
+            const blob = new Blob([htmlContent], { type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'DASM-e-عرض-المستثمر.docx';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+    </script>
+</body>
+</html> 
