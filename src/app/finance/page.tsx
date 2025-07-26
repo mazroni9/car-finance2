@@ -8,6 +8,40 @@ export default function FinanceCalculator() {
   const [downPaymentPercent, setDownPaymentPercent] = useState(10);
   const [lastPaymentPercent, setLastPaymentPercent] = useState(20);
   const [months, setMonths] = useState(24);
+  const [interestRate, setInterestRate] = useState(5); // Annual interest rate
+
+  // Calculate proper monthly installment with compound interest
+  const calculateMonthlyPayment = () => {
+    if (!carPrice) return 0;
+    
+    const principal = Number(carPrice);
+    const downPayment = principal * (downPaymentPercent / 100);
+    const lastPayment = principal * (lastPaymentPercent / 100);
+    const financedAmount = principal - downPayment - lastPayment;
+    
+    if (financedAmount <= 0) return 0;
+    
+    const monthlyRate = interestRate / 100 / 12;
+    if (monthlyRate === 0) return financedAmount / months;
+    
+    // PMT formula for compound interest
+    const monthlyPayment = financedAmount * 
+      (monthlyRate * Math.pow(1 + monthlyRate, months)) / 
+      (Math.pow(1 + monthlyRate, months) - 1);
+    
+    return monthlyPayment;
+  };
+
+  const calculateTotalAmount = () => {
+    if (!carPrice) return 0;
+    
+    const principal = Number(carPrice);
+    const downPayment = principal * (downPaymentPercent / 100);
+    const lastPayment = principal * (lastPaymentPercent / 100);
+    const monthlyPayment = calculateMonthlyPayment();
+    
+    return downPayment + (monthlyPayment * months) + lastPayment;
+  };
 
   return (
     <div className="min-h-screen bg-gray-50 py-8">
@@ -118,6 +152,22 @@ export default function FinanceCalculator() {
                   </select>
                 </div>
 
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    معدل الفائدة السنوي (%)
+                  </label>
+                  <input
+                    type="number"
+                    min="0"
+                    max="50"
+                    step="0.1"
+                    value={interestRate}
+                    onChange={(e) => setInterestRate(Number(e.target.value))}
+                    className="block w-full px-4 py-3 text-gray-900 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    dir="rtl"
+                  />
+                </div>
+
                 <button
                   onClick={() => {/* احسب القسط */}}
                   className="w-full bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors"
@@ -140,15 +190,19 @@ export default function FinanceCalculator() {
                   </div>
                   <div className="p-4 bg-gray-50 rounded-lg">
                     <div className="text-sm text-gray-600">القسط الشهري</div>
-                    <div className="text-lg font-semibold">{((Number(carPrice) - (Number(carPrice) * (downPaymentPercent / 100)) - (Number(carPrice) * (lastPaymentPercent / 100))) / months).toLocaleString()} ريال</div>
+                    <div className="text-lg font-semibold">{calculateMonthlyPayment().toLocaleString()} ريال</div>
                   </div>
                   <div className="p-4 bg-gray-50 rounded-lg">
                     <div className="text-sm text-gray-600">الدفعة الأخيرة</div>
                     <div className="text-lg font-semibold">{(Number(carPrice) * (lastPaymentPercent / 100)).toLocaleString()} ريال</div>
                   </div>
                   <div className="p-4 bg-gray-50 rounded-lg">
-                    <div className="text-sm text-gray-600">إجمالي المبلغ</div>
-                    <div className="text-lg font-semibold">{Number(carPrice).toLocaleString()} ريال</div>
+                    <div className="text-sm text-gray-600">إجمالي المبلغ المدفوع</div>
+                    <div className="text-lg font-semibold">{calculateTotalAmount().toLocaleString()} ريال</div>
+                  </div>
+                  <div className="p-4 bg-blue-50 rounded-lg border border-blue-200">
+                    <div className="text-sm text-blue-600">تكلفة التمويل الإضافية</div>
+                    <div className="text-lg font-semibold text-blue-800">{(calculateTotalAmount() - Number(carPrice)).toLocaleString()} ريال</div>
                   </div>
                 </div>
               ) : (

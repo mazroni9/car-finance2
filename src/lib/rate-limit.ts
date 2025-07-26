@@ -11,10 +11,30 @@ interface RateLimitResult {
 
 const requests = new Map<string, { count: number; timestamp: number }>();
 
+// Clean up expired entries periodically to prevent memory leaks
+function cleanupExpiredEntries() {
+  const now = Date.now();
+  const windowMs = 60 * 1000; // 1 minute
+  
+  for (const [key, value] of requests.entries()) {
+    if (now - value.timestamp > windowMs) {
+      requests.delete(key);
+    }
+  }
+}
+
+// Clean up every 5 minutes
+setInterval(cleanupExpiredEntries, 5 * 60 * 1000);
+
 export async function checkRateLimit(ip: string) {
   const now = Date.now();
   const windowMs = 60 * 1000; // 1 minute
   const maxRequests = 10; // max requests per minute
+
+  // Clean up expired entries on each call (more frequent cleanup)
+  if (requests.size > 1000) { // Only clean if map is getting large
+    cleanupExpiredEntries();
+  }
 
   const current = requests.get(ip) || { count: 0, timestamp: now };
   
@@ -32,24 +52,21 @@ export async function checkRateLimit(ip: string) {
 }
 
 export function rateLimit(options: RateLimitOptions): RateLimitResult {
-  const tokenCache = new LRUCache({
+  const tokenCache = new LRUCache<string, number>({
     max: options.uniqueTokenPerInterval || 500,
     ttl: options.interval || 60000,
   });
 
   return {
     check: async (limit: number, token: string): Promise<void> => {
-      const tokenCount = (tokenCache.get(token) as number[]) || [0];
-      if (tokenCount[0] === 0) {
-        tokenCache.set(token, tokenCount);
-      }
-      tokenCount[0] += 1;
-
-      const currentUsage = tokenCount[0];
-      if (currentUsage > limit) {
+      const currentCount = tokenCache.get(token) || 0;
+      const newCount = currentCount + 1;
+      
+      if (newCount > limit) {
         throw new Error('Rate limit exceeded');
       }
 
+      tokenCache.set(token, newCount);
       return Promise.resolve();
     },
   };
