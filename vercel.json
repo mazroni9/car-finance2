@@ -12,7 +12,15 @@
   ],
   "env": {
     "NODE_ENV": "production",
-    "NEXT_PUBLIC_APP_URL": "https://car-finance-dashboard.vercel.app"
+    "NEXT_PUBLIC_APP_URL": "https://car-finance2.vercel.app"
   },
-  "packageManager": "npm"
+  "git": {
+    "deploymentEnabled": {
+      "master": true
+    }
+  },
+  "github": {
+    "enabled": true,
+    "autoAlias": true
+  }
 } 
