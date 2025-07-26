@@ -16,6 +16,7 @@ interface FinancialSummary {
   avg_roi_full_period: number;
   avg_roi_annual: number;
   total_last_payment_all_contracts: number;
+  leased_cars_count: number;
 }
 
 interface FinanceSummaryProps {
@@ -106,6 +107,13 @@ export default function FinanceSummary({ summary }: FinanceSummaryProps) {
       color: 'bg-indigo-50 dark:bg-indigo-900/20',
       textColor: 'text-indigo-700 dark:text-indigo-300',
       icon: '📅'
+    },
+    {
+      label: 'إجمالي عدد السيارات في قواعد التمويل',
+      value: `${summary.leased_cars_count || 0}`,
+      color: 'bg-teal-50 dark:bg-teal-900/20',
+      textColor: 'text-teal-700 dark:text-teal-300',
+      icon: '🚗'
     }
   ];
 
@@ -128,6 +136,7 @@ export default function FinanceSummary({ summary }: FinanceSummaryProps) {
       ['إجمالي الربح السنوي قبل التكاليف', summary.total_annual_profit_before_costs],
       ['متوسط ROI كامل الفترة', (summary.avg_roi_full_period * 100).toFixed(1) + '%'],
       ['متوسط ROI السنوي', (summary.avg_roi_annual * 100).toFixed(1) + '%'],
+      ['إجمالي عدد السيارات في قواعد التمويل', summary.leased_cars_count || 0],
     ];
     summaryRows.forEach(([label, value]) => {
       doc.setFontSize(13);

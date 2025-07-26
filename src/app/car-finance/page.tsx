@@ -31,8 +31,6 @@ interface FinanceData {
   rent_distribution: number;
 }
 
-
-
 export default function CarFinancePage() {
   // دالة لحساب رسوم الخدمة التصاعدية
   const calculateServiceFee = (priceCategory: number): number => {
@@ -60,65 +58,95 @@ export default function CarFinancePage() {
     return calculatedFee;
   };
 
-  const [financeData, setFinanceData] = useState<FinanceData[]>(() => {
-    if (typeof window !== 'undefined') {
-      const saved = localStorage.getItem('financeData');
-      if (saved) {
-        try {
-          return JSON.parse(saved);
-        } catch {
-          // إذا كان هناك خطأ في البيانات المحفوظة، استخدم الافتراضي
-        }
+  // البيانات الافتراضية
+  const defaultData: FinanceData[] = [
+    {
+      id: 'new_1',
+      profit_percent: 30,
+      duration_months: 12,
+      price_category: 20000,
+      car_count: 1,
+      first_payment_percent: 0,
+      first_payment: calculateServiceFee(20000),
+      last_payment: 2000,
+      profit_after: 6000,
+      annual_profit: 6000,
+      installment_sale_price: 26000,
+      monthly_installment: 1750,
+      monthly_income: 1750,
+      purchase_capacity: 20000,
+      annual_income: 21000,
+      tracking_cost: 0,
+      guarantor_cost: 0,
+      inspection_cost: 0,
+      salary_distribution: 0,
+      rent_distribution: 0,
+    },
+    {
+      id: 'new_2',
+      profit_percent: 40,
+      duration_months: 24,
+      price_category: 25000,
+      car_count: 3,
+      first_payment_percent: 0,
+      first_payment: calculateServiceFee(25000),
+      last_payment: 2500,
+      profit_after: 10000,
+      annual_profit: 5000,
+      installment_sale_price: 35000,
+      monthly_installment: 1250,
+      monthly_income: 3750,
+      purchase_capacity: 75000,
+      annual_income: 45000,
+      tracking_cost: 0,
+      guarantor_cost: 0,
+      inspection_cost: 0,
+      salary_distribution: 0,
+      rent_distribution: 0,
+    },
+    {
+      id: 'new_3',
+      profit_percent: 50,
+      duration_months: 36,
+      price_category: 30000,
+      car_count: 10,
+      first_payment_percent: 0,
+      first_payment: calculateServiceFee(30000),
+      last_payment: 3000,
+      profit_after: 15000,
+      annual_profit: 5000,
+      installment_sale_price: 45000,
+      monthly_installment: 1000,
+      monthly_income: 10000,
+      purchase_capacity: 300000,
+      annual_income: 120000,
+      tracking_cost: 0,
+      guarantor_cost: 0,
+      inspection_cost: 0,
+      salary_distribution: 0,
+      rent_distribution: 0,
+    }
+  ];
+
+  const [financeData, setFinanceData] = useState<FinanceData[]>(defaultData);
+  const [isClient, setIsClient] = useState(false);
+
+  // التأكد من أن الكود يعمل فقط في المتصفح
+  useEffect(() => {
+    setIsClient(true);
+    
+    // تحميل البيانات من localStorage
+    const saved = localStorage.getItem('financeData');
+    if (saved) {
+      try {
+        const parsedData = JSON.parse(saved);
+        setFinanceData(parsedData);
+      } catch {
+        // إذا كان هناك خطأ في البيانات المحفوظة، استخدم الافتراضي
+        setFinanceData(defaultData);
       }
     }
-    // إذا لم توجد بيانات محفوظة، استخدم الافتراضي
-    return [
-      {
-        id: 'new_1',
-        profit_percent: 30,
-        duration_months: 12,
-        price_category: 20000,
-        car_count: 1,
-        first_payment_percent: 0,
-        first_payment: calculateServiceFee(20000),
-        last_payment: 2000,
-        profit_after: 6000,
-        annual_profit: 6000,
-        installment_sale_price: 26000,
-        monthly_installment: 1750,
-        monthly_income: 1750,
-        purchase_capacity: 20000,
-        annual_income: 21000,
-        tracking_cost: 0,
-        guarantor_cost: 0,
-        inspection_cost: 0,
-        salary_distribution: 0,
-        rent_distribution: 0,
-      },
-      {
-        id: 'new_2',
-        profit_percent: 40,
-        duration_months: 18,
-        price_category: 25000,
-        car_count: 1,
-        first_payment_percent: 0,
-        first_payment: calculateServiceFee(25000),
-        last_payment: 2500,
-        profit_after: 10000,
-        annual_profit: 6667,
-        installment_sale_price: 35000,
-        monthly_installment: 1611,
-        monthly_income: 1611,
-        purchase_capacity: 25000,
-        annual_income: 19332,
-        tracking_cost: 0,
-        guarantor_cost: 0,
-        inspection_cost: 0,
-        salary_distribution: 0,
-        rent_distribution: 0,
-      }
-    ];
-  });
+  }, []);
 
   const [showBackupNotice, setShowBackupNotice] = useState<string | null>(null);
 
@@ -178,7 +206,8 @@ export default function CarFinancePage() {
         total_profit_full_period: 0,
         total_purchase_cost: 0,
         avg_roi_full_period: 0,
-        avg_roi_annual: 0
+        avg_roi_annual: 0,
+        leased_cars_count: 0
       };
     }
 
@@ -232,6 +261,9 @@ export default function CarFinancePage() {
       ? ((total_annual_profit_before_costs + total_service_fees) / total_purchase_cost)
       : 0;
 
+    // حساب إجمالي عدد السيارات
+    const leased_cars_count = data.reduce((sum, item) => sum + (item.car_count || 0), 0);
+
     return {
       total_monthly_installments,
       total_annual_income,
@@ -243,7 +275,8 @@ export default function CarFinancePage() {
       total_profit_full_period,
       total_purchase_cost,
       avg_roi_full_period,
-      avg_roi_annual
+      avg_roi_annual,
+      leased_cars_count
     };
   };
 
@@ -372,6 +405,18 @@ export default function CarFinancePage() {
     XLSX.utils.book_append_sheet(workbook, worksheet, 'قواعد التمويل الاحترافي');
     XLSX.writeFile(workbook, 'جدول_قواعد_التمويل_الاحترافي.xlsx');
   };
+
+  // عدم عرض الكومبوننت حتى يتم تحميل البيانات في المتصفح
+  if (!isClient) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-4 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto mb-4"></div>
+          <p className="text-blue-900">جاري تحميل البيانات...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="container mx-auto py-8">
