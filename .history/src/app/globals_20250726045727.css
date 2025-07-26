@@ -37,7 +37,7 @@ select, input, option {
 
 @layer base {
   body {
-    @apply bg-slate-900 text-white;
+    @apply bg-gray-900 text-white;
   }
 }
 
