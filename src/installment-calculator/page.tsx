@@ -1,5 +1,4 @@
 import Link from 'next/link';
-import CarShowcase from '@/components/CarShowcase';
 
 const sampleCars = [
   {
@@ -53,7 +52,28 @@ export default function Home() {
       </section>
 
       {/* عرض السيارات */}
-      <CarShowcase cars={sampleCars} />
+      <div className="py-12 px-4">
+        <div className="max-w-7xl mx-auto">
+          <h2 className="text-3xl font-bold text-center mb-12">السيارات المتاحة</h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {sampleCars.map((car) => (
+              <div key={car.id} className="bg-white rounded-lg shadow-lg overflow-hidden">
+                <img 
+                  src={car.image} 
+                  alt={car.name}
+                  className="w-full h-48 object-cover"
+                />
+                <div className="p-6">
+                  <h3 className="text-xl font-bold mb-2">{car.name}</h3>
+                  <p className="text-2xl font-bold text-blue-600">
+                    {car.price.toLocaleString()} ريال
+                  </p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
 
       {/* الأقسام الرئيسية */}
       <section className="py-20 px-4">
